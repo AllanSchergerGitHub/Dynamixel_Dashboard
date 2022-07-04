@@ -85,17 +85,22 @@ public class JFrameClass extends javax.swing.JFrame {
     MotorClass motor3 = new MotorClass();
     MotorClass motor4 = new MotorClass();
     
-    public JFrameClass() {
+    
+    public void startupMethod(){
+        System.out.println("did i print this?");
+        JFrameClassUpdater mJFrameClassUpdater = new JFrameClassUpdater();
+        mJFrameClassUpdater.execute();
         initComponents();
-        final PausableSwingWorker<Void, String> worker = new PausableSwingWorker<Void, String>() {
-                @Override
-                protected Void doInBackground() 
+        prefs = Preferences.userRoot().node(this.getClass().getName());
+        jTextFieldSavedPosition1.setText(prefs.get("SavedPosition1_Name", "default"));
+        System.out.println("prefs.name() " + prefs.name()+" "+ prefs.absolutePath());
+    }
+    
+    final class JFrameClassUpdater extends SwingWorker<Void, Void> {
+        @Override
+        protected Void doInBackground()
                 {
-                    System.out.println("here4?");
                     System.out.println("Make sure power is connected and working. Can I automate this validation step?");
-                    
-                    prefs = Preferences.userRoot().node(this.getClass().getName());
-                    jTextFieldSavedPosition1.setText(prefs.get("SavedPosition1_Name", "default"));
                     
                     while (true) { 
                     Native.setProtected(true);
@@ -112,8 +117,6 @@ public class JFrameClass extends javax.swing.JFrame {
                     {
                       System.err.println("Failed to open the port!");
                     }
-                    //mReadPositionsLoadEtc.execute();
-                    
 
                     motorNumber = 0;
                     motor1.setBatchTime(Batch_time_stamp_into_mysql);
@@ -474,8 +477,8 @@ public class JFrameClass extends javax.swing.JFrame {
                 }
             }
         };    
-      worker.execute();
-    }
+//      worker.execute();
+//    }
             
     /**
      * This method is called from within the constructor to initialize the form.
@@ -1628,36 +1631,38 @@ public class JFrameClass extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new JFrameClass().setVisible(true);
+                JFrameClass jFrameClassFrontEnd = new JFrameClass();
+                jFrameClassFrontEnd.setVisible(true);
+                jFrameClassFrontEnd.startupMethod();
         
             }
         });
         
     }
 
-    abstract class PausableSwingWorker<K, V> extends SwingWorker<K, V> {
-        private volatile boolean isPaused;
-        public final void pause() {
-            if (!isPaused() && !isDone()) {
-                System.out.println("Paused? swing worker----------------------------------------------------------------------");
-                isPaused = true;
-                firePropertyChange("paused", false, true);
-            }
-        }
-
-        public final void resume23() {
-            if (isPaused() && !isDone()) {
-                System.out.println("Paused? swing worker----------------------------------------------------------------------");
-                isPaused = false;
-                firePropertyChange("paused", true, false);
-            }
-        }
-
-        public final boolean isPaused() {
-            System.out.println("Paused? swing worker----------------------------------------------------------------------");
-                return isPaused;
-        }
-    }
+//    abstract class PausableSwingWorker<K, V> extends SwingWorker<K, V> {
+//        private volatile boolean isPaused;
+//        public final void pause() {
+//            if (!isPaused() && !isDone()) {
+//                System.out.println("Paused? swing worker----------------------------------------------------------------------");
+//                isPaused = true;
+//                firePropertyChange("paused", false, true);
+//            }
+//        }
+//
+//        public final void resume23() {
+//            if (isPaused() && !isDone()) {
+//                System.out.println("Paused? swing worker----------------------------------------------------------------------");
+//                isPaused = false;
+//                firePropertyChange("paused", true, false);
+//            }
+//        }
+//
+//        public final boolean isPaused() {
+//            System.out.println("Paused? swing worker----------------------------------------------------------------------");
+//                return isPaused;
+//        }
+//    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
