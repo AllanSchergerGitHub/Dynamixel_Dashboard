@@ -26,10 +26,12 @@ import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -39,6 +41,7 @@ import javax.swing.SwingWorker;
 
 public class JFrameClass extends javax.swing.JFrame {
     Preferences prefs;
+    Preferences prefsGlobal; // technically this isn't 'Global' but it has a broad scope.
     public String Batch_time_stamp_into_mysql = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss.SSS").format(new Date());
     String time_stamp_into_mysql = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss.SSS").format(new Date());
     Dynamixel dynamixel = new Dynamixel();
@@ -91,9 +94,9 @@ public class JFrameClass extends javax.swing.JFrame {
         JFrameClassUpdater mJFrameClassUpdater = new JFrameClassUpdater();
         mJFrameClassUpdater.execute();
         initComponents();
-        prefs = Preferences.userRoot().node(this.getClass().getName());
-        jTextFieldSavedPosition1.setText(prefs.get("SavedPosition1_Name", "default"));
-        System.out.println("prefs.name() " + prefs.name()+" "+ prefs.absolutePath());
+        prefsGlobal = Preferences.userRoot().node(this.getClass().getName());
+        jTextFieldSavedPosition1.setText(prefsGlobal.get("SavedPosition1_Name", "default"));
+        System.out.println("prefsGlobal.name() " + prefsGlobal.name()+" "+ prefsGlobal.absolutePath() + " " + prefsGlobal.get("SavedPosition1_Name", "default2"));
     }
     
     final class JFrameClassUpdater extends SwingWorker<Void, Void> {
@@ -156,19 +159,19 @@ public class JFrameClass extends javax.swing.JFrame {
                         Logger.getLogger(MotorClass.class.getName()).log(Level.SEVERE, null, ex);
                     }
 
-                    prefs = Preferences.userRoot().node(this.getClass().getName());
+                    //prefs = Preferences.userRoot().node(this.getClass().getName());
                     //prefs.putInt("motor1ActualPosition", position1);
                     //prefs.putInt("motor1TargetPosition", TargetPosMtr1);
 
-                    System.out.println("prefs.name() " + prefs.name()+" "+ prefs.absolutePath()+ " Last Target1 from last session "+prefs.getInt("motor1TargetPosition", 99999));
-                    System.out.println("prefs.name() " + prefs.name()+" "+ prefs.absolutePath()+ " Last Target2 from last session "+prefs.getInt("motor2TargetPosition", 99999));
-                    System.out.println("prefs.name() " + prefs.name()+" "+ prefs.absolutePath()+ " Last Target3 from last session "+prefs.getInt("motor3TargetPosition", 99999));
-                    System.out.println("prefs.name() " + prefs.name()+" "+ prefs.absolutePath()+ " Last Target4 from last session "+prefs.getInt("motor4TargetPosition", 99999));
+                    System.out.println("prefsGlobal.name() " + prefsGlobal.name()+" "+ prefsGlobal.absolutePath()+ " Last Target1 from last session "+prefsGlobal.getInt("motor1TargetPosition", 99999));
+                    System.out.println("prefsGlobal.name() " + prefsGlobal.name()+" "+ prefsGlobal.absolutePath()+ " Last Target2 from last session "+prefsGlobal.getInt("motor2TargetPosition", 99999));
+                    System.out.println("prefsGlobal.name() " + prefsGlobal.name()+" "+ prefsGlobal.absolutePath()+ " Last Target3 from last session "+prefsGlobal.getInt("motor3TargetPosition", 99999));
+                    System.out.println("prefsGlobal.name() " + prefsGlobal.name()+" "+ prefsGlobal.absolutePath()+ " Last Target4 from last session "+prefsGlobal.getInt("motor4TargetPosition", 99999));
 
-                    System.out.println("prefs.name() " + prefs.name()+" "+ prefs.absolutePath()+ " Last Actuals1 from last session "+prefs.getInt("motor1ActualPosition", 99999));
-                    System.out.println("prefs.name() " + prefs.name()+" "+ prefs.absolutePath()+ " Last Actuals2 from last session "+prefs.getInt("motor2ActualPosition", 99999));
-                    System.out.println("prefs.name() " + prefs.name()+" "+ prefs.absolutePath()+ " Last Actuals3 from last session "+prefs.getInt("motor3ActualPosition", 99999));
-                    System.out.println("prefs.name() " + prefs.name()+" "+ prefs.absolutePath()+ " Last Actuals4 from last session "+prefs.getInt("motor4ActualPosition", 99999));
+                    System.out.println("prefsGlobal.name() " + prefsGlobal.name()+" "+ prefsGlobal.absolutePath()+ " Last Actuals1 from last session "+prefsGlobal.getInt("motor1ActualPosition", 99999));
+                    System.out.println("prefsGlobal.name() " + prefsGlobal.name()+" "+ prefsGlobal.absolutePath()+ " Last Actuals2 from last session "+prefsGlobal.getInt("motor2ActualPosition", 99999));
+                    System.out.println("prefsGlobal.name() " + prefsGlobal.name()+" "+ prefsGlobal.absolutePath()+ " Last Actuals3 from last session "+prefsGlobal.getInt("motor3ActualPosition", 99999));
+                    System.out.println("prefsGlobal.name() " + prefsGlobal.name()+" "+ prefsGlobal.absolutePath()+ " Last Actuals4 from last session "+prefsGlobal.getInt("motor4ActualPosition", 99999));
 
                     jRadioButtonPriorActualPositions.setSelected(true);
                     
@@ -194,17 +197,17 @@ public class JFrameClass extends javax.swing.JFrame {
                     }
                     
                     if(ActualsOrTarget == "Actuals"){
-                        TargetPosMtr1 = prefs.getInt("motor1ActualPosition", 99999);
-                        TargetPosMtr2 = prefs.getInt("motor2ActualPosition", 99999);
-                        TargetPosMtr3 = prefs.getInt("motor3ActualPosition", 99999);
-                        TargetPosMtr4 = prefs.getInt("motor4ActualPosition", 99999);
+                        TargetPosMtr1 = prefsGlobal.getInt("motor1ActualPosition", 99999);
+                        TargetPosMtr2 = prefsGlobal.getInt("motor2ActualPosition", 99999);
+                        TargetPosMtr3 = prefsGlobal.getInt("motor3ActualPosition", 99999);
+                        TargetPosMtr4 = prefsGlobal.getInt("motor4ActualPosition", 99999);
                     }
                     
                     if(ActualsOrTarget == "Target"){
-                        TargetPosMtr1 = prefs.getInt("motor1TargetPosition", 99999);
-                        TargetPosMtr2 = prefs.getInt("motor2TargetPosition", 99999);
-                        TargetPosMtr3 = prefs.getInt("motor3TargetPosition", 99999);
-                        TargetPosMtr4 = prefs.getInt("motor4TargetPosition", 99999);
+                        TargetPosMtr1 = prefsGlobal.getInt("motor1TargetPosition", 99999);
+                        TargetPosMtr2 = prefsGlobal.getInt("motor2TargetPosition", 99999);
+                        TargetPosMtr3 = prefsGlobal.getInt("motor3TargetPosition", 99999);
+                        TargetPosMtr4 = prefsGlobal.getInt("motor4TargetPosition", 99999);
                     }
                     
                     if(TargetPosMtr1>1300 || TargetPosMtr1<=0){TargetPosMtr1=HomePosMtr1;} // if the value read from the stored preferences from a prior session is outside the range of the dynamixel assume it is an error and use the home position instead.
@@ -453,25 +456,25 @@ public class JFrameClass extends javax.swing.JFrame {
                                 Logger.getLogger(JFrameClass.class.getName()).log(Level.SEVERE, null, ex1);
                             }
                         
-                            prefs = Preferences.userRoot().node(this.getClass().getName());
+                            //prefs = Preferences.userRoot().node(this.getClass().getName());
                             //prefs = Preferences.userRoot();
                             
                             
                             if(position1!=0 && position2!=0 && position3!=0 && position4!=0){ // only record when positions are not zero; zeros occur when shutting down and other times.	
-                                prefs.putInt("motor1ActualPosition", position1);
-                                prefs.putInt("motor2ActualPosition", position2);
-                                prefs.putInt("motor3ActualPosition", position3);
-                                prefs.putInt("motor4ActualPosition", position4);
+                                prefsGlobal.putInt("motor1ActualPosition", position1);
+                                prefsGlobal.putInt("motor2ActualPosition", position2);
+                                prefsGlobal.putInt("motor3ActualPosition", position3);
+                                prefsGlobal.putInt("motor4ActualPosition", position4);
                                 }
                             
-                            prefs.putInt("motor1TargetPosition", TargetPosMtr1);
-                            prefs.putInt("motor2TargetPosition", TargetPosMtr2);
-                            prefs.putInt("motor3TargetPosition", TargetPosMtr3);
-                            prefs.putInt("motor4TargetPosition", TargetPosMtr4);
-//                            System.out.println("prefs.name() " + prefs.name()+" "+ prefs.absolutePath()+ " 'motor1 motor1ActualPosition from last session '"+prefs.getInt("motor1ActualPosition", 99999));
-//                            System.out.println("prefs.name() " + prefs.name()+" "+ prefs.absolutePath()+ " 'motor1 motor2ActualPosition from last session '"+prefs.getInt("motor2ActualPosition", 99999));
-//                            System.out.println("prefs.name() " + prefs.name()+" "+ prefs.absolutePath()+ " 'motor1 motor3ActualPosition from last session '"+prefs.getInt("motor3ActualPosition", 99999));
-//                            System.out.println("prefs.name() " + prefs.name()+" "+ prefs.absolutePath()+ " 'motor1 motor4ActualPosition from last session '"+prefs.getInt("motor4ActualPosition", 99999));
+                            prefsGlobal.putInt("motor1TargetPosition", TargetPosMtr1);
+                            prefsGlobal.putInt("motor2TargetPosition", TargetPosMtr2);
+                            prefsGlobal.putInt("motor3TargetPosition", TargetPosMtr3);
+                            prefsGlobal.putInt("motor4TargetPosition", TargetPosMtr4);
+//                            System.out.println("prefsGlobal.name() " + prefsGlobal.name()+" "+ prefsGlobal.absolutePath()+ " 'motor1 motor1ActualPosition from last session '"+prefsGlobal.getInt("motor1ActualPosition", 99999));
+//                            System.out.println("prefsGlobal.name() " + prefsGlobal.name()+" "+ prefsGlobal.absolutePath()+ " 'motor1 motor2ActualPosition from last session '"+prefsGlobal.getInt("motor2ActualPosition", 99999));
+//                            System.out.println("prefsGlobal.name() " + prefsGlobal.name()+" "+ prefsGlobal.absolutePath()+ " 'motor1 motor3ActualPosition from last session '"+prefsGlobal.getInt("motor3ActualPosition", 99999));
+//                            System.out.println("prefsGlobal.name() " + prefsGlobal.name()+" "+ prefsGlobal.absolutePath()+ " 'motor1 motor4ActualPosition from last session '"+prefsGlobal.getInt("motor4ActualPosition", 99999));
                         }
                     }
                 }
@@ -579,6 +582,10 @@ public class JFrameClass extends javax.swing.JFrame {
         jRadioButtonHomePositions1 = new javax.swing.JRadioButton();
         jTextFieldSavedPosition1 = new javax.swing.JTextField();
         jButtonUpdateSavedPosition1 = new javax.swing.JButton();
+        jButtonListAllSavedPositions = new javax.swing.JButton();
+        jButtonClearThisSavedPreference = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jListSavedPositions = new javax.swing.JList<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -1148,6 +1155,31 @@ public class JFrameClass extends javax.swing.JFrame {
         });
         getContentPane().add(jButtonUpdateSavedPosition1, new org.netbeans.lib.awtextra.AbsoluteConstraints(1070, 540, -1, -1));
 
+        jButtonListAllSavedPositions.setText("List All Saved Positions");
+        jButtonListAllSavedPositions.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonListAllSavedPositionsActionPerformed(evt);
+            }
+        });
+        getContentPane().add(jButtonListAllSavedPositions, new org.netbeans.lib.awtextra.AbsoluteConstraints(1040, 580, 210, -1));
+
+        jButtonClearThisSavedPreference.setText("Clear This Saved Preference");
+        jButtonClearThisSavedPreference.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonClearThisSavedPreferenceActionPerformed(evt);
+            }
+        });
+        getContentPane().add(jButtonClearThisSavedPreference, new org.netbeans.lib.awtextra.AbsoluteConstraints(1040, 610, 210, 30));
+
+        jListSavedPositions.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+        jScrollPane2.setViewportView(jListSavedPositions);
+
+        getContentPane().add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1040, 650, 290, 320));
+
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
@@ -1545,25 +1577,31 @@ public class JFrameClass extends javax.swing.JFrame {
         System.out.println("ActualPosMtr3 " + position3);
         System.out.println("ActualPosMtr4 " + position4);
         
-        prefs.putInt("SavedPosition1motor1TargetPosition", position1);
-        prefs.putInt("SavedPosition1motor2TargetPosition", position2);
-        prefs.putInt("SavedPosition1motor3TargetPosition", position3);
-        prefs.putInt("SavedPosition1motor4TargetPosition", position4);
-        prefs.put("SavedPosition1_Name", PositionName);
+        prefsGlobal.putInt(PositionName+"SavedPosition1motor1TargetPosition", position1);
+        prefsGlobal.putInt(PositionName+"SavedPosition1motor2TargetPosition", position2);
+        prefsGlobal.putInt(PositionName+"SavedPosition1motor3TargetPosition", position3);
+        prefsGlobal.putInt(PositionName+"SavedPosition1motor4TargetPosition", position4);
+        prefsGlobal.put(PositionName+"SavedPosition1_Name", PositionName);
 
     }//GEN-LAST:event_jButtonUpdateSavedPosition1ActionPerformed
 
     private void jRadioButtonSavedPositions1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonSavedPositions1ActionPerformed
-        System.out.println("Saved Preferences Used. Name = " + prefs.get("SavedPosition1_Name", "default"));
-        TargetPosMtr1 = prefs.getInt("SavedPosition1motor1TargetPosition", 99999);
-        TargetPosMtr2 = prefs.getInt("SavedPosition1motor2TargetPosition", 99999);
-        TargetPosMtr3 = prefs.getInt("SavedPosition1motor3TargetPosition", 99999);
-        TargetPosMtr4 = prefs.getInt("SavedPosition1motor4TargetPosition", 99999);
+        String PositionName = jTextFieldSavedPosition1.getText();
+        System.out.println("Saved Preferences Used. Name = " + prefsGlobal.get(PositionName+"SavedPosition1_Name", "default"));
+        
+        TargetPosMtr1 = prefsGlobal.getInt(PositionName+"SavedPosition1motor1TargetPosition", 99999);
+        TargetPosMtr2 = prefsGlobal.getInt(PositionName+"SavedPosition1motor2TargetPosition", 99999);
+        TargetPosMtr3 = prefsGlobal.getInt(PositionName+"SavedPosition1motor3TargetPosition", 99999);
+        TargetPosMtr4 = prefsGlobal.getInt(PositionName+"SavedPosition1motor4TargetPosition", 99999);
         System.out.println("TargetPosMtr1 " + TargetPosMtr1);
         System.out.println("TargetPosMtr2 " + TargetPosMtr2);
         System.out.println("TargetPosMtr3 " + TargetPosMtr3);
         System.out.println("TargetPosMtr4 " + TargetPosMtr4);
-        
+        if(TargetPosMtr1>1300 || TargetPosMtr1<=0){TargetPosMtr1=HomePosMtr1;} // if the value read from the stored preferences from a prior session is outside the range of the dynamixel assume it is an error and use the home position instead.
+        if(TargetPosMtr2>1300 || TargetPosMtr2<=0){TargetPosMtr2=HomePosMtr2;} // if the value read from the stored preferences from a prior session is outside the range of the dynamixel assume it is an error and use the home position instead.
+        if(TargetPosMtr3>1300 || TargetPosMtr3<=0){TargetPosMtr3=HomePosMtr3;} // if the value read from the stored preferences from a prior session is outside the range of the dynamixel assume it is an error and use the home position instead.
+        if(TargetPosMtr4>1300 || TargetPosMtr4<=0){TargetPosMtr4=HomePosMtr4;} // if the value read from the stored preferences from a prior session is outside the range of the dynamixel assume it is an error and use the home position instead.
+                    
         jScrollBarMtr1.setValue(TargetPosMtr1); motor1.moveMotor((short)TargetPosMtr1); jLabelMotor1.setText(""+TargetPosMtr1);
         jScrollBarMtr2.setValue(TargetPosMtr2); motor2.moveMotor((short)TargetPosMtr2); jLabelMotor2.setText(""+TargetPosMtr2);
         jScrollBarMtr3.setValue(TargetPosMtr3); motor3.moveMotor((short)TargetPosMtr3); jLabelMotor3.setText(""+TargetPosMtr3);
@@ -1584,20 +1622,44 @@ public class JFrameClass extends javax.swing.JFrame {
         System.out.println("TargetPosMtr3 " + TargetPosMtr3);
         System.out.println("TargetPosMtr4 " + TargetPosMtr4);
         
-        jScrollBarMtr1.setValue(TargetPosMtr1); motor1.moveMotor((short)TargetPosMtr1); jLabelMotor1.setText(""+TargetPosMtr1);
         jScrollBarMtr2.setValue(TargetPosMtr2); motor2.moveMotor((short)TargetPosMtr2); jLabelMotor2.setText(""+TargetPosMtr2);
         jScrollBarMtr3.setValue(TargetPosMtr3); motor3.moveMotor((short)TargetPosMtr3); jLabelMotor3.setText(""+TargetPosMtr3);
         
         // move arm up and wait a bit before moving it left/right to the home position so it doesn't drag along the ground
+        // also don't move the end effector until arm moved up
             try {
                 sleep(1000);
             } catch (InterruptedException ex) {
                 Logger.getLogger(JFrameClass.class.getName()).log(Level.SEVERE, null, ex);
             }
+        jScrollBarMtr1.setValue(TargetPosMtr1); motor1.moveMotor((short)TargetPosMtr1); jLabelMotor1.setText(""+TargetPosMtr1);
         jScrollBarMtr4_Target.setValue(TargetPosMtr4); motor4.moveMotor((short)TargetPosMtr4); jLabelMotor4.setText(""+TargetPosMtr4);
         
         }
     }//GEN-LAST:event_jRadioButtonHomePositions1ActionPerformed
+
+    private void jButtonListAllSavedPositionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonListAllSavedPositionsActionPerformed
+        System.out.println("Node's keys: ");
+        DefaultListModel listmodel=new DefaultListModel();         
+        //listmodel.addElement("YOUR NEW DATA");          
+        
+        try {
+            for (String s : prefsGlobal.keys()) {
+                System.out.println(s + " : " + prefsGlobal.get(s, ""));
+                listmodel.addElement(s);
+            }   
+        } catch (BackingStoreException ex) {
+            Logger.getLogger(JFrameClass.class.getName()).log(Level.SEVERE, null, ex);
+        }
+      jListSavedPositions.setModel(listmodel);
+    }//GEN-LAST:event_jButtonListAllSavedPositionsActionPerformed
+
+    private void jButtonClearThisSavedPreferenceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonClearThisSavedPreferenceActionPerformed
+
+        System.out.println("Selected Value = " + jListSavedPositions.getSelectedValue());
+        prefsGlobal.remove(jListSavedPositions.getSelectedValue());
+
+    }//GEN-LAST:event_jButtonClearThisSavedPreferenceActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1666,10 +1728,12 @@ public class JFrameClass extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JButton jButtonClearThisSavedPreference;
     private javax.swing.JButton jButtonDisableTorqueAllMotors;
     private javax.swing.JButton jButtonEnableTorqueAllMotors;
     private javax.swing.JButton jButtonExit;
     private javax.swing.JButton jButtonGoToDesiredStartPosition;
+    private javax.swing.JButton jButtonListAllSavedPositions;
     private javax.swing.JButton jButtonMoveMtr1ToPresetHigh;
     private javax.swing.JButton jButtonMoveMtr1ToPresetLow;
     private javax.swing.JButton jButtonMoveMtr2ToPresetHigh;
@@ -1707,6 +1771,7 @@ public class JFrameClass extends javax.swing.JFrame {
     private javax.swing.JLabel jLabelMotor3;
     private javax.swing.JLabel jLabelMotor4;
     private javax.swing.JLabel jLabel_Increment;
+    private javax.swing.JList<String> jListSavedPositions;
     private javax.swing.JRadioButton jRadioButtonHomePositions1;
     private javax.swing.JRadioButton jRadioButtonPriorActualPositions;
     private javax.swing.JRadioButton jRadioButtonPriorTargetPositions;
@@ -1717,6 +1782,7 @@ public class JFrameClass extends javax.swing.JFrame {
     private javax.swing.JScrollBar jScrollBarMtr4_Actual;
     private javax.swing.JScrollBar jScrollBarMtr4_Target;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSlider jSlider1_ActualTemp;
     private javax.swing.JSlider jSlider2_ActualTemp;
     private javax.swing.JSlider jSlider3_ActualTemp;
