@@ -37,7 +37,7 @@ public class MotorClass {
     private short[] ADDR_MX_GOAL_POSITION        = {30,30,30,30,30,30,30,30};  // 182
     private short dxl_goal_position              = 300;
     private short[] ADDR_MX_PRESENT_POSITION     = new short[] {36,36,36,36,36,36,36,36};
-    private short[] ADDR_MX_PRESENT_LOAD         = {40,40,40,40,40,40,40,40};
+    private short[] ADDR_MX_PRESENT_LOAD         = new short[] {40,40,40,40,40,40,40,40};
     private short[] ADDR_MX_PresentTemperature   = {43,43,43,43,43,43,43,43};
     private int COMM_SUCCESS                     = 0;                   // Communication Success result value
     private int COMM_TX_FAIL                     = -1001;               // Communication Tx Failed
@@ -155,20 +155,26 @@ public class MotorClass {
      * pings the dynamixel to determine the load on the device
      * @return 
      */
-    public short readLoad() {
-        short load = dynamixel.read2ByteTxRx(port_num, PROTOCOL_VERSION[motorNumber], DXL_ID[motorNumber], ADDR_MX_PRESENT_LOAD[motorNumber]);
+    public Long readLoad() {
+        //short load_short = dynamixel.read2ByteTxRx(port_num, PROTOCOL_VERSION[motorNumber], DXL_ID[motorNumber], ADDR_MX_PRESENT_LOAD[motorNumber]);
+        double load_short = dynamixel.read2ByteTxRx(port_num, PROTOCOL_VERSION[motorNumber], DXL_ID[motorNumber], ADDR_MX_PRESENT_LOAD[motorNumber]);
+        Long load = (long)load_short;
+        load = load.valueOf(load);
         if ((dxl_comm_result = dynamixel.getLastTxRxResult(port_num, PROTOCOL_VERSION[motorNumber])) != COMM_SUCCESS)
         {
             if(mTogglePrintDebugValue){
                 System.err.println(load+ " <-load. "+motorNumber + " <<motorNumber. Load Not read correctly"+dxl_comm_result+" "+dynamixel.getLastTxRxResult(port_num, PROTOCOL_VERSION[motorNumber]));
             }
-            short loadReadFail = (short)999999;
+            Long loadReadFail = (long)999999;
             return loadReadFail;
         }
         else if ((dxl_error = dynamixel.getLastRxPacketError(port_num, PROTOCOL_VERSION[motorNumber])) != 0)
         {
           System.err.println(dxl_error+" dxl_error is here --------------------------------------");
           dynamixel.printRxPacketError(PROTOCOL_VERSION[motorNumber], dxl_error);
+        }
+        if(load>=1024){ // per documentation; load of 1024 or greater (up to 2,047) is negative (CW). Values from 0-1023 are increasingly positive (CCW). https://emanual.robotis.com/docs/en/dxl/ax/ax-18a/#present-load
+            load = 1024-load;
         }
         return load;
     }
@@ -235,7 +241,7 @@ public class MotorClass {
             }
             else {
                 tries = 10;
-                System.out.println("Success disabling torque on motor # " + motorNumber);//. dxl_comm_result = " + dxl_comm_result);
+                //System.out.println("Success setting moving speed on motor # " + motorNumber);//. dxl_comm_result = " + dxl_comm_result);
             }
         }        
         int movingSpeedSetting2 = dynamixel.read2ByteTxRx(port_num, PROTOCOL_VERSION[motorNumber], DXL_ID[motorNumber], ADDR_movingspeed[motorNumber]);

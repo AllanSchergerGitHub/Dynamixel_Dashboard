@@ -9,6 +9,7 @@ https://stackoverflow.com/questions/26265002/pause-and-resume-swingworker-doinba
  */
 package javaapplication1;
 
+import org.apache.commons.lang3.ArrayUtils;
 import com.sun.jna.Native;
 import java.awt.Color;
 import static java.lang.Math.abs;
@@ -23,6 +24,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -71,6 +73,15 @@ public class JFrameClass extends javax.swing.JFrame {
     int load2 = 0;
     int load3 = 0;
     int load4 = 0;
+    int load1_movingaverage = 0;
+    int load2_movingaverage = 0;
+    int load3_movingaverage = 0;
+    int load4_movingaverage = 0;
+    //int[] load_movingaverage_array = new int[]{0, 0, 0, 0};    
+    List<Long> load1_movingaverage_list = new ArrayList<>();
+    List<Long> load2_movingaverage_list = new ArrayList<>();
+    List<Long> load3_movingaverage_list = new ArrayList<>();
+    List<Long> load4_movingaverage_list = new ArrayList<>();
     int mGoalPosLabelMotor1             = 0;
     int PROTOCOL_VERSION                = 1;
     int group_num = dynamixel.groupBulkRead(port_num, PROTOCOL_VERSION);
@@ -97,6 +108,21 @@ public class JFrameClass extends javax.swing.JFrame {
         prefsGlobal = Preferences.userRoot().node(this.getClass().getName());
         jTextFieldSavedPosition1.setText(prefsGlobal.get("SavedPosition1_Name", "default"));
         System.out.println("prefsGlobal.name() " + prefsGlobal.name()+" "+ prefsGlobal.absolutePath() + " " + prefsGlobal.get("SavedPosition1_Name", "default2"));
+    }
+    
+    /*
+        Returns zero if the list size is zero to avoid div by zero error
+    */
+    public Long movingAverage(List<Long> myList) {
+        Long value = (long)0;
+        value = value.valueOf(value);
+        for(int i = 0; i<myList.size(); i++){
+            value = value + myList.get(i);
+        }
+        if(myList.size()!=0) {
+            value = value / myList.size();}
+        else {myList.size();}
+        return value; 
     }
     
     final class JFrameClassUpdater extends SwingWorker<Void, Void> {
@@ -334,9 +360,9 @@ public class JFrameClass extends javax.swing.JFrame {
                                     
                                     jTextField_PositionMtr1.setText(position1+"");
                                     sleep(1);
-                                    short load1 = motor1.readLoad();
+                                    Long load1 = motor1.readLoad();
                                     //System.out.println("Load1 " + load1 + " Position motor1 "+position1);
-                                    jTextField_Load_2.setText(load1 + "");
+                                    jTextField_LoadEndEffector.setText(load1 + "");
                                     if (load1 == 16959){
                                         jLabelMotor1.setOpaque(true);
                                         jLabelMotor1.setBackground(Color.red);
@@ -358,9 +384,9 @@ public class JFrameClass extends javax.swing.JFrame {
                                     sleep(2); // RxTx takes 100 ms? need to reread documentation.
                                     position2 = motor2.readPosition();	
                                     jTextField_PositionMtr2.setText(position2+"");	
-                                    int load2 = motor2.readLoad();
+                                    Long load2 = motor2.readLoad();
                                     
-                                    jTextField_Load_3.setText(load2 + "");
+                                    jTextField_Load_2.setText(load2 + "");
                                     
                                     if (load2 == 999999){	
                                         jLabelMotor2.setOpaque(true);
@@ -384,9 +410,20 @@ public class JFrameClass extends javax.swing.JFrame {
                                     sleep(2); // RxTx takes 100 ms? need to reread documentation.	
                                     position3 = motor3.readPosition();	
                                     jTextField_PositionMtr3.setText(position3+"");	
-                                    int load3 = motor3.readLoad();
+                                    Long load3 = motor3.readLoad();
                                     
-                                    jTextField_Load_4.setText(load3 + "");
+                                    //jTextField_Load_4.setText(load3 + "");
+                                    if(load3!=0 & load3<=2047){
+                                        load3_movingaverage_list.add(load3);
+                                    }
+                                    if(load3_movingaverage_list.size()>10) {
+                                        load3_movingaverage_list.remove(0);
+                                    }
+                                    Long movingAverage3 = movingAverage(load3_movingaverage_list);
+                                    System.out.println(movingAverage3 + " " + load3_movingaverage_list + " " + load3_movingaverage_list.size() + " most recent load = " + load3);
+                                    //load4_movingaverage = load4_movingaverage + load4 - ;
+                                    
+                                    jTextField_Load_3.setText(movingAverage3 + "");
                                     
                                     if (load3 == 999999){
                                         jLabelMotor3.setOpaque(true);
@@ -411,8 +448,17 @@ public class JFrameClass extends javax.swing.JFrame {
                                     position4 = motor4.readPosition();	
                                     jTextField_PositionMtr4.setText(position4+"");	
                                     jScrollBarMtr4_Actual.setValue(position4);
-                                    int load4 = motor4.readLoad();	
-                                    jTextField_LoadEndEffector.setText(load4 + "");
+                                    long load4 = motor4.readLoad();
+                                    if(load4!=0 & load4<=2047){
+                                        load4_movingaverage_list.add(load4);
+                                    }
+                                    if(load4_movingaverage_list.size()>10) {
+                                        load4_movingaverage_list.remove(0);
+                                    }
+                                    Long movingAverage4 = movingAverage(load4_movingaverage_list);
+                                    //System.out.println(movingAverage4 + " " + load4_movingaverage_list + " " + load4_movingaverage_list.size() + " most recent load = " + load4);
+                                    //load4_movingaverage = load4_movingaverage + load4 - ;
+                                    jTextField_Load_4.setText(load4 + "");
                                     if (load4 == 999999){
                                         jLabelMotor4.setOpaque(true);
                                         jLabelMotor4.setBackground(Color.red);	
@@ -596,7 +642,7 @@ public class JFrameClass extends javax.swing.JFrame {
                 jButtonMoveMtr1ToPresetHighActionPerformed(evt);
             }
         });
-        getContentPane().add(jButtonMoveMtr1ToPresetHigh, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 350, 83, 58));
+        getContentPane().add(jButtonMoveMtr1ToPresetHigh, new org.netbeans.lib.awtextra.AbsoluteConstraints(188, 350, 84, 58));
 
         jButtonMoveMtr1ToPresetLow.setText("Max Down");
         jButtonMoveMtr1ToPresetLow.addActionListener(new java.awt.event.ActionListener() {
@@ -604,7 +650,7 @@ public class JFrameClass extends javax.swing.JFrame {
                 jButtonMoveMtr1ToPresetLowActionPerformed(evt);
             }
         });
-        getContentPane().add(jButtonMoveMtr1ToPresetLow, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 470, 83, 51));
+        getContentPane().add(jButtonMoveMtr1ToPresetLow, new org.netbeans.lib.awtextra.AbsoluteConstraints(188, 470, 84, 51));
 
         jScrollBarMtr1.setBlockIncrement(20);
         jScrollBarMtr1.setMaximum(1000);
@@ -645,10 +691,11 @@ public class JFrameClass extends javax.swing.JFrame {
         getContentPane().add(jScrollBarMtr3, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 53, 33, 130));
 
         jScrollBarMtr4_Target.setBlockIncrement(20);
-        jScrollBarMtr4_Target.setMaximum(700);
-        jScrollBarMtr4_Target.setMinimum(385);
-        jScrollBarMtr4_Target.setValue(500);
-        jScrollBarMtr4_Target.setVisibleAmount(20);
+        jScrollBarMtr4_Target.setMaximum(-385);
+        jScrollBarMtr4_Target.setMinimum(-700);
+        jScrollBarMtr4_Target.setToolTipText("");
+        jScrollBarMtr4_Target.setUnitIncrement(-1);
+        jScrollBarMtr4_Target.setValue(-500);
         jScrollBarMtr4_Target.addAdjustmentListener(new java.awt.event.AdjustmentListener() {
             public void adjustmentValueChanged(java.awt.event.AdjustmentEvent evt) {
                 jScrollBarMtr4_TargetAdjustmentValueChanged(evt);
@@ -665,7 +712,7 @@ public class JFrameClass extends javax.swing.JFrame {
                 jButtonStepUpMtr1ActionPerformed(evt);
             }
         });
-        getContentPane().add(jButtonStepUpMtr1, new org.netbeans.lib.awtextra.AbsoluteConstraints(195, 410, -1, -1));
+        getContentPane().add(jButtonStepUpMtr1, new org.netbeans.lib.awtextra.AbsoluteConstraints(185, 410, 90, -1));
 
         jButtonStepDownMtr1.setText("step down");
         jButtonStepDownMtr1.setPreferredSize(new java.awt.Dimension(72, 22));
@@ -674,7 +721,7 @@ public class JFrameClass extends javax.swing.JFrame {
                 jButtonStepDownMtr1ActionPerformed(evt);
             }
         });
-        getContentPane().add(jButtonStepDownMtr1, new org.netbeans.lib.awtextra.AbsoluteConstraints(195, 440, -1, -1));
+        getContentPane().add(jButtonStepDownMtr1, new org.netbeans.lib.awtextra.AbsoluteConstraints(185, 440, 90, -1));
 
         jButtonExit.setText("Exit");
         jButtonExit.addActionListener(new java.awt.event.ActionListener() {
@@ -706,7 +753,7 @@ public class JFrameClass extends javax.swing.JFrame {
                 jButtonMoveMtr2ToPresetHighActionPerformed(evt);
             }
         });
-        getContentPane().add(jButtonMoveMtr2ToPresetHigh, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 350, 83, 58));
+        getContentPane().add(jButtonMoveMtr2ToPresetHigh, new org.netbeans.lib.awtextra.AbsoluteConstraints(333, 350, 84, 58));
 
         jButtonStepUpMtr2.setText("step up");
         jButtonStepUpMtr2.addActionListener(new java.awt.event.ActionListener() {
@@ -714,7 +761,7 @@ public class JFrameClass extends javax.swing.JFrame {
                 jButtonStepUpMtr2ActionPerformed(evt);
             }
         });
-        getContentPane().add(jButtonStepUpMtr2, new org.netbeans.lib.awtextra.AbsoluteConstraints(335, 410, -1, -1));
+        getContentPane().add(jButtonStepUpMtr2, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 410, 90, -1));
 
         jButtonStepDownMtr2.setText("step down");
         jButtonStepDownMtr2.setPreferredSize(new java.awt.Dimension(72, 22));
@@ -723,7 +770,7 @@ public class JFrameClass extends javax.swing.JFrame {
                 jButtonStepDownMtr2ActionPerformed(evt);
             }
         });
-        getContentPane().add(jButtonStepDownMtr2, new org.netbeans.lib.awtextra.AbsoluteConstraints(335, 440, -1, -1));
+        getContentPane().add(jButtonStepDownMtr2, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 440, 90, -1));
 
         jButtonMoveMtr2ToPresetLow.setText("Max Down");
         jButtonMoveMtr2ToPresetLow.addActionListener(new java.awt.event.ActionListener() {
@@ -731,7 +778,7 @@ public class JFrameClass extends javax.swing.JFrame {
                 jButtonMoveMtr2ToPresetLowActionPerformed(evt);
             }
         });
-        getContentPane().add(jButtonMoveMtr2ToPresetLow, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 470, 83, 51));
+        getContentPane().add(jButtonMoveMtr2ToPresetLow, new org.netbeans.lib.awtextra.AbsoluteConstraints(333, 470, 84, 51));
 
         jToggleButtonMtr2.setText("Lower Torque");
         jToggleButtonMtr2.addActionListener(new java.awt.event.ActionListener() {
@@ -761,7 +808,7 @@ public class JFrameClass extends javax.swing.JFrame {
                 jButtonMoveMtr3ToPresetHighActionPerformed(evt);
             }
         });
-        getContentPane().add(jButtonMoveMtr3ToPresetHigh, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 350, 83, 58));
+        getContentPane().add(jButtonMoveMtr3ToPresetHigh, new org.netbeans.lib.awtextra.AbsoluteConstraints(463, 350, 84, 58));
 
         jButtonStepUpMtr3.setText("step up");
         jButtonStepUpMtr3.addActionListener(new java.awt.event.ActionListener() {
@@ -769,7 +816,7 @@ public class JFrameClass extends javax.swing.JFrame {
                 jButtonStepUpMtr3ActionPerformed(evt);
             }
         });
-        getContentPane().add(jButtonStepUpMtr3, new org.netbeans.lib.awtextra.AbsoluteConstraints(465, 410, -1, -1));
+        getContentPane().add(jButtonStepUpMtr3, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 410, 90, -1));
 
         jButtonStepDownMtr3.setText("step down");
         jButtonStepDownMtr3.setPreferredSize(new java.awt.Dimension(72, 22));
@@ -778,7 +825,7 @@ public class JFrameClass extends javax.swing.JFrame {
                 jButtonStepDownMtr3ActionPerformed(evt);
             }
         });
-        getContentPane().add(jButtonStepDownMtr3, new org.netbeans.lib.awtextra.AbsoluteConstraints(465, 440, -1, -1));
+        getContentPane().add(jButtonStepDownMtr3, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 440, 90, -1));
 
         jButtonMoveMtr3ToPresetLow.setText("Max Down");
         jButtonMoveMtr3ToPresetLow.addActionListener(new java.awt.event.ActionListener() {
@@ -786,7 +833,7 @@ public class JFrameClass extends javax.swing.JFrame {
                 jButtonMoveMtr3ToPresetLowActionPerformed(evt);
             }
         });
-        getContentPane().add(jButtonMoveMtr3ToPresetLow, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 470, 83, 51));
+        getContentPane().add(jButtonMoveMtr3ToPresetLow, new org.netbeans.lib.awtextra.AbsoluteConstraints(463, 470, 84, 51));
 
         jToggleButtonMtr3.setText("Lower Torque");
         jToggleButtonMtr3.addActionListener(new java.awt.event.ActionListener() {
@@ -810,23 +857,23 @@ public class JFrameClass extends javax.swing.JFrame {
                 jButtonMoveMtr4ToPresetHighActionPerformed(evt);
             }
         });
-        getContentPane().add(jButtonMoveMtr4ToPresetHigh, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 350, 83, 58));
+        getContentPane().add(jButtonMoveMtr4ToPresetHigh, new org.netbeans.lib.awtextra.AbsoluteConstraints(613, 350, 84, 58));
 
-        jButtonStepUpMtr4.setText("Left");
+        jButtonStepUpMtr4.setText("Right");
         jButtonStepUpMtr4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonStepUpMtr4ActionPerformed(evt);
             }
         });
-        getContentPane().add(jButtonStepUpMtr4, new org.netbeans.lib.awtextra.AbsoluteConstraints(615, 410, -1, -1));
+        getContentPane().add(jButtonStepUpMtr4, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 410, 90, -1));
 
-        jButtonStepDownMtr4.setText("Right");
+        jButtonStepDownMtr4.setText("Left");
         jButtonStepDownMtr4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonStepDownMtr4ActionPerformed(evt);
             }
         });
-        getContentPane().add(jButtonStepDownMtr4, new org.netbeans.lib.awtextra.AbsoluteConstraints(615, 440, -1, -1));
+        getContentPane().add(jButtonStepDownMtr4, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 440, 90, -1));
 
         jButtonMoveMtr4ToPresetLow.setText("Max Down");
         jButtonMoveMtr4ToPresetLow.addActionListener(new java.awt.event.ActionListener() {
@@ -834,7 +881,7 @@ public class JFrameClass extends javax.swing.JFrame {
                 jButtonMoveMtr4ToPresetLowActionPerformed(evt);
             }
         });
-        getContentPane().add(jButtonMoveMtr4ToPresetLow, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 470, 83, 51));
+        getContentPane().add(jButtonMoveMtr4ToPresetLow, new org.netbeans.lib.awtextra.AbsoluteConstraints(613, 470, 84, 51));
 
         jToggleButtonMtr4.setText("Lower Torque");
         jToggleButtonMtr4.addActionListener(new java.awt.event.ActionListener() {
@@ -1017,16 +1064,16 @@ public class JFrameClass extends javax.swing.JFrame {
         getContentPane().add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(635, 10, 60, 30));
 
         jTextField_LoadEndEffector.setText("Load");
-        getContentPane().add(jTextField_LoadEndEffector, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 310, -1, -1));
+        getContentPane().add(jTextField_LoadEndEffector, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 310, 75, -1));
 
         jTextField_Load_2.setText("Load");
-        getContentPane().add(jTextField_Load_2, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 310, -1, -1));
+        getContentPane().add(jTextField_Load_2, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 310, 75, -1));
 
         jTextField_Load_4.setText("Load");
-        getContentPane().add(jTextField_Load_4, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 310, -1, -1));
+        getContentPane().add(jTextField_Load_4, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 310, 75, -1));
 
         jTextField_Load_3.setText("Load");
-        getContentPane().add(jTextField_Load_3, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 310, -1, -1));
+        getContentPane().add(jTextField_Load_3, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 310, 75, -1));
 
         jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel8.setText("Wrist");
@@ -1215,8 +1262,9 @@ public class JFrameClass extends javax.swing.JFrame {
     }//GEN-LAST:event_jScrollBarMtr3AdjustmentValueChanged
 
     private void jScrollBarMtr4_TargetAdjustmentValueChanged(java.awt.event.AdjustmentEvent evt) {//GEN-FIRST:event_jScrollBarMtr4_TargetAdjustmentValueChanged
-        short j = (short)jScrollBarMtr4_Target.getValue();
-        motor4.moveMotor(j);
+        short j = (short)Math.abs((short)jScrollBarMtr4_Target.getValue());
+        System.out.println("Target position is now: " + j);
+        motor4.moveMotor((short)j);
         TargetPosMtr4 = (int)j;
         jLabelMotor4.setText(""+j);
     }//GEN-LAST:event_jScrollBarMtr4_TargetAdjustmentValueChanged
@@ -1408,12 +1456,12 @@ public class JFrameClass extends javax.swing.JFrame {
         int val = Integer.valueOf(jTextFieldSpeedMotor4.getText());
         motor4.setMovingSpeed(val);
         
-        int moveIncrement = -25;
-        moveIncrement = -Integer.parseInt(jTextField_IncrementMtr4.getText());
+        int moveIncrement = -0; // value is not set here. It is set by reading the jTextField_InrementalMtr4.getText().
+        moveIncrement = -Integer.parseInt(jTextField_IncrementMtr4.getText())*-1;
         short currentPos = motor4.readPosition();
         System.out.println("currentPos "+ currentPos + "; moveIncrement "+moveIncrement +" TargetPosMtr4 "+TargetPosMtr4 );
         TargetPosMtr4 = TargetPosMtr4 + moveIncrement;
-        jScrollBarMtr4_Target.setValue(TargetPosMtr4);
+        jScrollBarMtr4_Target.setValue(TargetPosMtr4*-1); // this scroll bar is negative so left/right look right on the GUI
         motor4.moveMotor((short)(TargetPosMtr4));
          try {
              sleep(1);
@@ -1421,20 +1469,18 @@ public class JFrameClass extends javax.swing.JFrame {
              Logger.getLogger(JFrameClass.class.getName()).log(Level.SEVERE, null, ex);
          }
         jLabelMotor4.setText(TargetPosMtr4+"");
-        
-        jScrollBarMtr4_Target.setValue(TargetPosMtr4);
     }//GEN-LAST:event_jButtonStepUpMtr4ActionPerformed
 
     private void jButtonStepDownMtr4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonStepDownMtr4ActionPerformed
         int val = Integer.valueOf(jTextFieldSpeedMotor4.getText());
         motor4.setMovingSpeed(val);
         
-        int moveIncrement = 25;
-        moveIncrement = Integer.parseInt(jTextField_IncrementMtr4.getText());
+        int moveIncrement = 0; // value is not set here. It is set by reading the jTextField_InrementalMtr4.getText().
+        moveIncrement = Integer.parseInt(jTextField_IncrementMtr4.getText())*-1;
         short currentPos = motor4.readPosition();
         System.out.println("currentPos "+ currentPos + "; moveIncrement "+moveIncrement +" TargetPosMtr4 "+TargetPosMtr4 );
         TargetPosMtr4 = TargetPosMtr4 + moveIncrement;
-        jScrollBarMtr4_Target.setValue(TargetPosMtr4);
+        jScrollBarMtr4_Target.setValue(TargetPosMtr4*-1);
         motor4.moveMotor((short)(TargetPosMtr4));
          try {
              sleep(1);
@@ -1442,8 +1488,6 @@ public class JFrameClass extends javax.swing.JFrame {
              Logger.getLogger(JFrameClass.class.getName()).log(Level.SEVERE, null, ex);
          }
         jLabelMotor4.setText(TargetPosMtr4+"");
-        
-        jScrollBarMtr4_Target.setValue(TargetPosMtr4);
     }//GEN-LAST:event_jButtonStepDownMtr4ActionPerformed
 
     private void jButtonMoveMtr4ToPresetLowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonMoveMtr4ToPresetLowActionPerformed
@@ -1605,7 +1649,7 @@ public class JFrameClass extends javax.swing.JFrame {
         jScrollBarMtr1.setValue(TargetPosMtr1); motor1.moveMotor((short)TargetPosMtr1); jLabelMotor1.setText(""+TargetPosMtr1);
         jScrollBarMtr2.setValue(TargetPosMtr2); motor2.moveMotor((short)TargetPosMtr2); jLabelMotor2.setText(""+TargetPosMtr2);
         jScrollBarMtr3.setValue(TargetPosMtr3); motor3.moveMotor((short)TargetPosMtr3); jLabelMotor3.setText(""+TargetPosMtr3);
-        jScrollBarMtr4_Target.setValue(TargetPosMtr4); motor4.moveMotor((short)TargetPosMtr4); jLabelMotor4.setText(""+TargetPosMtr4);
+        jScrollBarMtr4_Target.setValue(TargetPosMtr4*-1); motor4.moveMotor((short)TargetPosMtr4); jLabelMotor4.setText(""+TargetPosMtr4);
         
     }//GEN-LAST:event_jRadioButtonSavedPositions1ActionPerformed
 
@@ -1633,7 +1677,7 @@ public class JFrameClass extends javax.swing.JFrame {
                 Logger.getLogger(JFrameClass.class.getName()).log(Level.SEVERE, null, ex);
             }
         jScrollBarMtr1.setValue(TargetPosMtr1); motor1.moveMotor((short)TargetPosMtr1); jLabelMotor1.setText(""+TargetPosMtr1);
-        jScrollBarMtr4_Target.setValue(TargetPosMtr4); motor4.moveMotor((short)TargetPosMtr4); jLabelMotor4.setText(""+TargetPosMtr4);
+        jScrollBarMtr4_Target.setValue(TargetPosMtr4*-1); motor4.moveMotor((short)TargetPosMtr4); jLabelMotor4.setText(""+TargetPosMtr4);
         
         }
     }//GEN-LAST:event_jRadioButtonHomePositions1ActionPerformed
