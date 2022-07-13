@@ -3,9 +3,29 @@
 started to refactor the code at 9:20PM on Dec 13, 2021
 https://stackoverflow.com/questions/26265002/pause-and-resume-swingworker-doinbackground
 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+Several modes of operation:
+    1) manually move the motor rotation to desired position; using visual observation of end effector to know xyz
+    2) manually move the xyz variables and use math (or a precalc'd table) to derive the required motor rotation positions.
+            Incorporate speed for each phase of the movement; as well as delays on some directions to control the path?
+    3) move from one stored xyz to another stored xyz position by clicking on the start and end position
+        3a) move to home position, etc
+    4) pattern moves - ie cover a plane with a hatch pattern, etc (move back and forth over a square area to touch every point within the square.
+    5) sequences of pattern moves - ie cover a plane at level z; then move to level z+1 and cover the plan; etc
+    6) sequences of moves involving the rover and the arm. ie. cover one square area with rover arm; move the rover forward; repeat.
+    7) these examples could be expanded to include visual or machine learning overvations to either avoid or go to certain areas. (ie avoid good plants; go to bad plants).
+    8) 
+
+Layers:
+    Goals
+    Path Planning
+        incremental positions; speed; how will we know if we reached one goal before going to the next goal?
+    Monitoring and Control
+
+Fixes:
+    some of the button action events have too much going on inside them. 
+    Limit the action to the setting of variables (ie target positions) and let the motion happen in the doinbackground section? or does this affect the GUI?
+    May need to incorporate some threads to carry out actions. Also, for the arm dynamixels there is a readall capability that is faster. https://github.com/ROBOTIS-GIT/DynamixelSDK/issues/506
+
  */
 package javaapplication1;
 
@@ -361,13 +381,22 @@ public class JFrameClass extends javax.swing.JFrame {
                                     jTextField_PositionMtr1.setText(position1+"");
                                     sleep(1);
                                     Long load1 = motor1.readLoad();
-                                    //System.out.println("Load1 " + load1 + " Position motor1 "+position1);
-                                    jTextField_LoadEndEffector.setText(load1 + "");
+                                    
+                                    if(load1>=-1023 & load1<=1023){
+                                        load1_movingaverage_list.add(load1);
+                                    }
+                                    if(load1_movingaverage_list.size()>9) {
+                                        load1_movingaverage_list.remove(0);
+                                    }
+                                    Long movingAverage1 = movingAverage(load1_movingaverage_list);
+                                    
+                                    jTextField_LoadEndEffector.setText(movingAverage1 + "");
                                     if (load1 == 16959){
                                         jLabelMotor1.setOpaque(true);
                                         jLabelMotor1.setBackground(Color.red);
                                     }
                                     else {
+                                        jLabelMotor1.setOpaque(true);
                                         jLabelMotor1.setBackground(Color.green);
                                     }
                                     int Temp1C = motor1.readPresentTemperature(); // this also has read errors that appear to be high temps
@@ -386,7 +415,14 @@ public class JFrameClass extends javax.swing.JFrame {
                                     jTextField_PositionMtr2.setText(position2+"");	
                                     Long load2 = motor2.readLoad();
                                     
-                                    jTextField_Load_2.setText(load2 + "");
+                                    if(load2>=-1023 & load2<=1023){
+                                        load2_movingaverage_list.add(load2);
+                                    }
+                                    if(load2_movingaverage_list.size()>9) {
+                                        load2_movingaverage_list.remove(0);
+                                    }
+                                    Long movingAverage2 = movingAverage(load2_movingaverage_list);
+                                    jTextField_Load_2.setText(movingAverage2 + "");
                                     
                                     if (load2 == 999999){	
                                         jLabelMotor2.setOpaque(true);
@@ -412,16 +448,14 @@ public class JFrameClass extends javax.swing.JFrame {
                                     jTextField_PositionMtr3.setText(position3+"");	
                                     Long load3 = motor3.readLoad();
                                     
-                                    //jTextField_Load_4.setText(load3 + "");
-                                    if(load3!=0 & load3<=2047){
+                                    if(load3>=-1023 & load3<=1023){
                                         load3_movingaverage_list.add(load3);
                                     }
-                                    if(load3_movingaverage_list.size()>10) {
+                                    if(load3_movingaverage_list.size()>9) {
                                         load3_movingaverage_list.remove(0);
                                     }
                                     Long movingAverage3 = movingAverage(load3_movingaverage_list);
                                     System.out.println(movingAverage3 + " " + load3_movingaverage_list + " " + load3_movingaverage_list.size() + " most recent load = " + load3);
-                                    //load4_movingaverage = load4_movingaverage + load4 - ;
                                     
                                     jTextField_Load_3.setText(movingAverage3 + "");
                                     
@@ -449,16 +483,16 @@ public class JFrameClass extends javax.swing.JFrame {
                                     jTextField_PositionMtr4.setText(position4+"");	
                                     jScrollBarMtr4_Actual.setValue(position4);
                                     long load4 = motor4.readLoad();
-                                    if(load4!=0 & load4<=2047){
+                                    
+                                    if(load4>=-1023 & load4<=1023){
                                         load4_movingaverage_list.add(load4);
                                     }
-                                    if(load4_movingaverage_list.size()>10) {
+                                    if(load4_movingaverage_list.size()>9) {
                                         load4_movingaverage_list.remove(0);
                                     }
                                     Long movingAverage4 = movingAverage(load4_movingaverage_list);
-                                    //System.out.println(movingAverage4 + " " + load4_movingaverage_list + " " + load4_movingaverage_list.size() + " most recent load = " + load4);
-                                    //load4_movingaverage = load4_movingaverage + load4 - ;
-                                    jTextField_Load_4.setText(load4 + "");
+                                    
+                                    jTextField_Load_4.setText(movingAverage4 + "");
                                     if (load4 == 999999){
                                         jLabelMotor4.setOpaque(true);
                                         jLabelMotor4.setBackground(Color.red);	
@@ -991,7 +1025,7 @@ public class JFrameClass extends javax.swing.JFrame {
         getContentPane().add(jTextFieldSpeedMotor4, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 190, 50, -1));
 
         jLabel1.setText("Speed");
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 200, -1, -1));
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 195, -1, -1));
 
         jTextField_IncrementMtr1.setText("250");
         jTextField_IncrementMtr1.setMinimumSize(new java.awt.Dimension(12, 25));
@@ -1015,22 +1049,22 @@ public class JFrameClass extends javax.swing.JFrame {
 
         jLabel_Increment.setText("Increment");
         jLabel_Increment.setToolTipText("How much does the motor move on one click.");
-        getContentPane().add(jLabel_Increment, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 230, 70, -1));
+        getContentPane().add(jLabel_Increment, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 225, 70, -1));
 
         jTextField_PositionMtr4.setText("Position");
-        getContentPane().add(jTextField_PositionMtr4, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 250, 50, -1));
+        getContentPane().add(jTextField_PositionMtr4, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 255, 50, -1));
 
         jTextField_PositionMtr1.setText("Position");
-        getContentPane().add(jTextField_PositionMtr1, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 250, 50, -1));
+        getContentPane().add(jTextField_PositionMtr1, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 255, 50, -1));
 
         jTextField_PositionMtr2.setText("Position");
-        getContentPane().add(jTextField_PositionMtr2, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 250, 50, -1));
+        getContentPane().add(jTextField_PositionMtr2, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 255, 50, -1));
 
         jTextField_PositionMtr3.setText("Position");
-        getContentPane().add(jTextField_PositionMtr3, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 250, 50, -1));
+        getContentPane().add(jTextField_PositionMtr3, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 255, 50, -1));
 
         jLabel2.setText("Pos Read");
-        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 260, -1, -1));
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 255, -1, -1));
 
         jLabel3.setText("Target Position");
         getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 280, -1, 30));
@@ -1101,7 +1135,7 @@ public class JFrameClass extends javax.swing.JFrame {
         jSlider1_ActualTemp.setPaintLabels(true);
         jSlider1_ActualTemp.setPaintTicks(true);
         jSlider1_ActualTemp.setToolTipText("");
-        getContentPane().add(jSlider1_ActualTemp, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 100, 20, -1));
+        getContentPane().add(jSlider1_ActualTemp, new org.netbeans.lib.awtextra.AbsoluteConstraints(784, 100, 20, -1));
 
         jSlider2_ActualTemp.setMaximum(160);
         jSlider2_ActualTemp.setMinimum(110);
@@ -1109,7 +1143,7 @@ public class JFrameClass extends javax.swing.JFrame {
         jSlider2_ActualTemp.setOrientation(javax.swing.JSlider.VERTICAL);
         jSlider2_ActualTemp.setPaintLabels(true);
         jSlider2_ActualTemp.setPaintTicks(true);
-        getContentPane().add(jSlider2_ActualTemp, new org.netbeans.lib.awtextra.AbsoluteConstraints(820, 100, 20, -1));
+        getContentPane().add(jSlider2_ActualTemp, new org.netbeans.lib.awtextra.AbsoluteConstraints(816, 100, 20, -1));
 
         jSlider3_ActualTemp.setMaximum(160);
         jSlider3_ActualTemp.setMinimum(110);
@@ -1117,7 +1151,7 @@ public class JFrameClass extends javax.swing.JFrame {
         jSlider3_ActualTemp.setOrientation(javax.swing.JSlider.VERTICAL);
         jSlider3_ActualTemp.setPaintLabels(true);
         jSlider3_ActualTemp.setPaintTicks(true);
-        getContentPane().add(jSlider3_ActualTemp, new org.netbeans.lib.awtextra.AbsoluteConstraints(850, 100, 20, -1));
+        getContentPane().add(jSlider3_ActualTemp, new org.netbeans.lib.awtextra.AbsoluteConstraints(848, 100, 20, -1));
 
         jTextArea1.setColumns(20);
         jTextArea1.setLineWrap(true);
@@ -1146,16 +1180,16 @@ public class JFrameClass extends javax.swing.JFrame {
         getContentPane().add(jToggleButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 350, 150, 50));
 
         jTextFieldTempMtr4.setText("jTextField1");
-        getContentPane().add(jTextFieldTempMtr4, new org.netbeans.lib.awtextra.AbsoluteConstraints(870, 80, 40, -1));
+        getContentPane().add(jTextFieldTempMtr4, new org.netbeans.lib.awtextra.AbsoluteConstraints(875, 80, 40, -1));
 
         jTextFieldTempMtr3.setText("jTextField1");
-        getContentPane().add(jTextFieldTempMtr3, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 80, 40, -1));
+        getContentPane().add(jTextFieldTempMtr3, new org.netbeans.lib.awtextra.AbsoluteConstraints(835, 80, 40, -1));
 
         jTextFieldTempMtr2.setText("jTextField1");
-        getContentPane().add(jTextFieldTempMtr2, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 80, 40, -1));
+        getContentPane().add(jTextFieldTempMtr2, new org.netbeans.lib.awtextra.AbsoluteConstraints(795, 80, 40, -1));
 
         jTextFieldTempMtr1.setText("jTextField1");
-        getContentPane().add(jTextFieldTempMtr1, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 80, 40, -1));
+        getContentPane().add(jTextFieldTempMtr1, new org.netbeans.lib.awtextra.AbsoluteConstraints(755, 80, 40, -1));
 
         buttonGroup1.add(jRadioButtonPriorActualPositions);
         jRadioButtonPriorActualPositions.setText("Use Prior Actual Positions");
