@@ -13,7 +13,10 @@ Several modes of operation:
     5) sequences of pattern moves - ie cover a plane at level z; then move to level z+1 and cover the plan; etc
     6) sequences of moves involving the rover and the arm. ie. cover one square area with rover arm; move the rover forward; repeat.
     7) these examples could be expanded to include visual or machine learning overvations to either avoid or go to certain areas. (ie avoid good plants; go to bad plants).
-    
+
+Questions:
+    1) do I need to create a queue of commands that need to be completed one after another sequentially? Or can I interupt the current queue of commands before the queue is completed?
+
 Layers:
     Goals
     Path Planning
@@ -1293,7 +1296,6 @@ public class JFrameClass extends javax.swing.JFrame {
 
     private void jScrollBarMtr4_TargetAdjustmentValueChanged(java.awt.event.AdjustmentEvent evt) {//GEN-FIRST:event_jScrollBarMtr4_TargetAdjustmentValueChanged
         short j = (short)Math.abs((short)jScrollBarMtr4_Target.getValue());
-        System.out.println("Target position is now: " + j);
         motor4.moveMotor((short)j);
         TargetPosMtr4 = (int)j;
         jLabelMotor4.setText(""+j);
@@ -1305,16 +1307,9 @@ public class JFrameClass extends javax.swing.JFrame {
         
         int moveIncrement = -100;
         moveIncrement = -Integer.parseInt(jTextField_IncrementMtr1.getText());
-        //short currentPos = motor1.readPosition(); // currentPos is a local reading - testing to see if using the more global variable is better
-        System.out.println("currentPosXXXXX "+ position1 + "; moveIncrement "+moveIncrement +" TargetPosMtr1 "+TargetPosMtr1 );
         TargetPosMtr1 = TargetPosMtr1 + moveIncrement;
         jScrollBarMtr1_Target.setValue(TargetPosMtr1);
         motor1.moveMotor((short)(TargetPosMtr1));
-         try {
-             sleep(1);
-         } catch (InterruptedException ex) {
-             Logger.getLogger(JFrameClass.class.getName()).log(Level.SEVERE, null, ex);
-         }
         jLabelMotor1.setText(TargetPosMtr1+"");
     }//GEN-LAST:event_jButtonStepUpMtr1ActionPerformed
 
@@ -1325,15 +1320,9 @@ public class JFrameClass extends javax.swing.JFrame {
         int moveIncrement = 100;
         moveIncrement = Integer.parseInt(jTextField_IncrementMtr1.getText());
         short currentPos = motor1.readPosition();
-        System.out.println("currentPos "+ currentPos + "; moveIncrement "+moveIncrement +" TargetPosMtr1 "+TargetPosMtr1 );
         TargetPosMtr1 = TargetPosMtr1 + moveIncrement;
         jScrollBarMtr1_Target.setValue(TargetPosMtr1);
         motor1.moveMotor((short)(TargetPosMtr1));
-         try {
-             sleep(1);
-         } catch (InterruptedException ex) {
-             Logger.getLogger(JFrameClass.class.getName()).log(Level.SEVERE, null, ex);
-         }
         jLabelMotor1.setText(TargetPosMtr1+"");
     }//GEN-LAST:event_jButtonStepDownMtr1ActionPerformed
 
@@ -1370,15 +1359,9 @@ public class JFrameClass extends javax.swing.JFrame {
         int moveIncrement = 25;
         moveIncrement = move_direction * Integer.parseInt(jTextField_IncrementMtr2.getText());
         short currentPos = motor2.readPosition();
-        System.out.println("currentPos "+ currentPos + "; moveIncrement "+moveIncrement +" TargetPosMtr2 "+TargetPosMtr2 );
         TargetPosMtr2 = TargetPosMtr2 + moveIncrement;
         jScrollBarMtr2_Target.setValue(TargetPosMtr2);
         motor2.moveMotor((short)(TargetPosMtr2));
-         try {
-             sleep(1);
-         } catch (InterruptedException ex) {
-             Logger.getLogger(JFrameClass.class.getName()).log(Level.SEVERE, null, ex);
-         }
         jLabelMotor2.setText(TargetPosMtr2+"");
     }//GEN-LAST:event_jButtonStepUpMtr2ActionPerformed
 
@@ -1390,15 +1373,9 @@ public class JFrameClass extends javax.swing.JFrame {
         int moveIncrement = 25;
         moveIncrement = move_direction * Integer.parseInt(jTextField_IncrementMtr2.getText());
         short currentPos = motor2.readPosition();
-        System.out.println("currentPos "+ currentPos + "; moveIncrement "+moveIncrement +" TargetPosMtr2 "+TargetPosMtr2 );
         TargetPosMtr2 = TargetPosMtr2 + moveIncrement;
         jScrollBarMtr2_Target.setValue(TargetPosMtr2);
         motor2.moveMotor((short)(TargetPosMtr2));
-         try {
-             sleep(1);
-         } catch (InterruptedException ex) {
-             Logger.getLogger(JFrameClass.class.getName()).log(Level.SEVERE, null, ex);
-         }
         jLabelMotor2.setText(TargetPosMtr2+"");
     }//GEN-LAST:event_jButtonStepDownMtr2ActionPerformed
 
@@ -1430,15 +1407,9 @@ public class JFrameClass extends javax.swing.JFrame {
         int moveIncrement = 25;
         moveIncrement = move_direction * Integer.parseInt(jTextField_IncrementMtr3.getText());
         short currentPos = motor3.readPosition();
-        System.out.println("currentPos "+ currentPos + "; moveIncrement "+moveIncrement +" TargetPosMtr3 "+TargetPosMtr3 );
         TargetPosMtr3 = TargetPosMtr3 + moveIncrement;
         jScrollBarMtr3_Target.setValue(TargetPosMtr3);
         motor3.moveMotor((short)(TargetPosMtr3));
-         try {
-             sleep(1);
-         } catch (InterruptedException ex) {
-             Logger.getLogger(JFrameClass.class.getName()).log(Level.SEVERE, null, ex);
-         }
         jLabelMotor3.setText(TargetPosMtr3+"");
     }//GEN-LAST:event_jButtonStepUpMtr3ActionPerformed
 
@@ -1450,15 +1421,9 @@ public class JFrameClass extends javax.swing.JFrame {
         int moveIncrement = 25;
         moveIncrement = move_direction * Integer.parseInt(jTextField_IncrementMtr3.getText());
         short currentPos = motor3.readPosition();
-        System.out.println("currentPos "+ currentPos + "; moveIncrement "+moveIncrement +" TargetPosMtr3 "+TargetPosMtr3 );
         TargetPosMtr3 = TargetPosMtr3 + moveIncrement;
         jScrollBarMtr3_Target.setValue(TargetPosMtr3);
         motor3.moveMotor((short)(TargetPosMtr3));
-         try {
-             sleep(1);
-         } catch (InterruptedException ex) {
-             Logger.getLogger(JFrameClass.class.getName()).log(Level.SEVERE, null, ex);
-         }
         jLabelMotor3.setText(TargetPosMtr3+"");
     }//GEN-LAST:event_jButtonStepDownMtr3ActionPerformed
 
@@ -1489,15 +1454,9 @@ public class JFrameClass extends javax.swing.JFrame {
         int moveIncrement = -0; // value is not set here. It is set by reading the jTextField_InrementalMtr4.getText().
         moveIncrement = -Integer.parseInt(jTextField_IncrementMtr4.getText())*-1;
         short currentPos = motor4.readPosition();
-        System.out.println("currentPos "+ currentPos + "; moveIncrement "+moveIncrement +" TargetPosMtr4 "+TargetPosMtr4 );
         TargetPosMtr4 = TargetPosMtr4 + moveIncrement;
         jScrollBarMtr4_Target.setValue(TargetPosMtr4*-1); // this scroll bar is negative so left/right look right on the GUI
         motor4.moveMotor((short)(TargetPosMtr4));
-         try {
-             sleep(1);
-         } catch (InterruptedException ex) {
-             Logger.getLogger(JFrameClass.class.getName()).log(Level.SEVERE, null, ex);
-         }
         jLabelMotor4.setText(TargetPosMtr4+"");
     }//GEN-LAST:event_jButtonStepUpMtr4ActionPerformed
 
@@ -1508,15 +1467,9 @@ public class JFrameClass extends javax.swing.JFrame {
         int moveIncrement = 0; // value is not set here. It is set by reading the jTextField_InrementalMtr4.getText().
         moveIncrement = Integer.parseInt(jTextField_IncrementMtr4.getText())*-1;
         short currentPos = motor4.readPosition();
-        System.out.println("currentPos "+ currentPos + "; moveIncrement "+moveIncrement +" TargetPosMtr4 "+TargetPosMtr4 );
         TargetPosMtr4 = TargetPosMtr4 + moveIncrement;
         jScrollBarMtr4_Target.setValue(TargetPosMtr4*-1);
         motor4.moveMotor((short)(TargetPosMtr4));
-         try {
-             sleep(1);
-         } catch (InterruptedException ex) {
-             Logger.getLogger(JFrameClass.class.getName()).log(Level.SEVERE, null, ex);
-         }
         jLabelMotor4.setText(TargetPosMtr4+"");
     }//GEN-LAST:event_jButtonStepDownMtr4ActionPerformed
 

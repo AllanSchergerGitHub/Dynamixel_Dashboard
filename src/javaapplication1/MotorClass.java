@@ -95,7 +95,7 @@ public class MotorClass {
         }
       
         while(true){
-            short moving    = dynamixel.read2ByteTxRx(port_num, PROTOCOL_VERSION[motorNumber], DXL_ID[motorNumber], (short)46);
+            short moving    = dynamixel.read1ByteTxRx(port_num, PROTOCOL_VERSION[motorNumber], DXL_ID[motorNumber], (short)46);
             //short position  = dynamixel.read2ByteTxRx(port_num, PROTOCOL_VERSION[motorNumber], DXL_ID[motorNumber], ADDR_MX_PRESENT_POSITION[motorNumber]);
             //short load      = dynamixel.read2ByteTxRx(port_num, PROTOCOL_VERSION[motorNumber], DXL_ID[motorNumber], ADDR_MX_PRESENT_LOAD[motorNumber]);
             String movingText = "Not moving";
@@ -184,7 +184,7 @@ public class MotorClass {
      * @return 
      */
     public short readPresentTemperature() {
-        short temperature = dynamixel.read2ByteTxRx(port_num, PROTOCOL_VERSION[motorNumber], DXL_ID[motorNumber], ADDR_MX_PresentTemperature[motorNumber]);
+        short temperature = dynamixel.read1ByteTxRx(port_num, PROTOCOL_VERSION[motorNumber], DXL_ID[motorNumber], ADDR_MX_PresentTemperature[motorNumber]);
         if ((dxl_comm_result = dynamixel.getLastTxRxResult(port_num, PROTOCOL_VERSION[motorNumber])) != COMM_SUCCESS)
         {
             if(mTogglePrintDebugValue){
@@ -245,7 +245,6 @@ public class MotorClass {
             }
         }        
         int movingSpeedSetting2 = dynamixel.read2ByteTxRx(port_num, PROTOCOL_VERSION[motorNumber], DXL_ID[motorNumber], ADDR_movingspeed[motorNumber]);
-        System.out.println("moving speed "+motorNumber+" set to "+movingSpeedSetting2);
     }
     
     /**
