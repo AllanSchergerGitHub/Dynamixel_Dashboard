@@ -13,8 +13,7 @@ Several modes of operation:
     5) sequences of pattern moves - ie cover a plane at level z; then move to level z+1 and cover the plan; etc
     6) sequences of moves involving the rover and the arm. ie. cover one square area with rover arm; move the rover forward; repeat.
     7) these examples could be expanded to include visual or machine learning overvations to either avoid or go to certain areas. (ie avoid good plants; go to bad plants).
-    8) 
-
+    
 Layers:
     Goals
     Path Planning
@@ -372,7 +371,7 @@ public class JFrameClass extends javax.swing.JFrame {
                                     if(RunEndEffectorContinuously){
                                             if(position1<300){TargetPosMtr1=950;} // if less than 300 then switch to a large target
                                             if(position1>800){TargetPosMtr1=100;} // if over 800 then switch to a lower target; otherwise (implied) keep moving toward the existing target
-                                            jScrollBarMtr1.setValue(TargetPosMtr1);
+                                            jScrollBarMtr1_Target.setValue(TargetPosMtr1);
                                             motor1.moveMotor((short)TargetPosMtr1);
                                             TargetPosMtr1 = (int)TargetPosMtr1;
                                             jLabelMotor1.setText(""+TargetPosMtr1);
@@ -455,7 +454,7 @@ public class JFrameClass extends javax.swing.JFrame {
                                         load3_movingaverage_list.remove(0);
                                     }
                                     Long movingAverage3 = movingAverage(load3_movingaverage_list);
-                                    System.out.println(movingAverage3 + " " + load3_movingaverage_list + " " + load3_movingaverage_list.size() + " most recent load = " + load3);
+                                    //System.out.println(movingAverage3 + " " + load3_movingaverage_list + " " + load3_movingaverage_list.size() + " most recent load = " + load3);
                                     
                                     jTextField_Load_3.setText(movingAverage3 + "");
                                     
@@ -539,7 +538,6 @@ public class JFrameClass extends javax.swing.JFrame {
                             //prefs = Preferences.userRoot().node(this.getClass().getName());
                             //prefs = Preferences.userRoot();
                             
-                            
                             if(position1!=0 && position2!=0 && position3!=0 && position4!=0){ // only record when positions are not zero; zeros occur when shutting down and other times.	
                                 prefsGlobal.putInt("motor1ActualPosition", position1);
                                 prefsGlobal.putInt("motor2ActualPosition", position2);
@@ -560,8 +558,6 @@ public class JFrameClass extends javax.swing.JFrame {
                 }
             }
         };    
-//      worker.execute();
-//    }
             
     /**
      * This method is called from within the constructor to initialize the form.
@@ -575,10 +571,10 @@ public class JFrameClass extends javax.swing.JFrame {
         buttonGroup1 = new javax.swing.ButtonGroup();
         jButtonMoveMtr1ToPresetHigh = new javax.swing.JButton();
         jButtonMoveMtr1ToPresetLow = new javax.swing.JButton();
-        jScrollBarMtr1 = new javax.swing.JScrollBar();
+        jScrollBarMtr1_Target = new javax.swing.JScrollBar();
         jLabelMotor1 = new javax.swing.JLabel();
-        jScrollBarMtr2 = new javax.swing.JScrollBar();
-        jScrollBarMtr3 = new javax.swing.JScrollBar();
+        jScrollBarMtr2_Target = new javax.swing.JScrollBar();
+        jScrollBarMtr3_Target = new javax.swing.JScrollBar();
         jScrollBarMtr4_Target = new javax.swing.JScrollBar();
         jLabelMotor2 = new javax.swing.JLabel();
         jButtonStepUpMtr1 = new javax.swing.JButton();
@@ -686,43 +682,43 @@ public class JFrameClass extends javax.swing.JFrame {
         });
         getContentPane().add(jButtonMoveMtr1ToPresetLow, new org.netbeans.lib.awtextra.AbsoluteConstraints(188, 470, 84, 51));
 
-        jScrollBarMtr1.setBlockIncrement(20);
-        jScrollBarMtr1.setMaximum(1000);
-        jScrollBarMtr1.setValue(390);
-        jScrollBarMtr1.setVisibleAmount(20);
-        jScrollBarMtr1.addAdjustmentListener(new java.awt.event.AdjustmentListener() {
+        jScrollBarMtr1_Target.setBlockIncrement(20);
+        jScrollBarMtr1_Target.setMaximum(1000);
+        jScrollBarMtr1_Target.setValue(390);
+        jScrollBarMtr1_Target.setVisibleAmount(20);
+        jScrollBarMtr1_Target.addAdjustmentListener(new java.awt.event.AdjustmentListener() {
             public void adjustmentValueChanged(java.awt.event.AdjustmentEvent evt) {
-                jScrollBarMtr1AdjustmentValueChanged(evt);
+                jScrollBarMtr1_TargetAdjustmentValueChanged(evt);
             }
         });
-        getContentPane().add(jScrollBarMtr1, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 53, 30, 130));
+        getContentPane().add(jScrollBarMtr1_Target, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 53, 30, 130));
 
         jLabelMotor1.setText("Position");
         getContentPane().add(jLabelMotor1, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 280, 57, 30));
 
-        jScrollBarMtr2.setBlockIncrement(20);
-        jScrollBarMtr2.setMaximum(1000);
-        jScrollBarMtr2.setMinimum(700);
-        jScrollBarMtr2.setValue(850);
-        jScrollBarMtr2.setVisibleAmount(20);
-        jScrollBarMtr2.addAdjustmentListener(new java.awt.event.AdjustmentListener() {
+        jScrollBarMtr2_Target.setBlockIncrement(20);
+        jScrollBarMtr2_Target.setMaximum(1000);
+        jScrollBarMtr2_Target.setMinimum(700);
+        jScrollBarMtr2_Target.setValue(850);
+        jScrollBarMtr2_Target.setVisibleAmount(20);
+        jScrollBarMtr2_Target.addAdjustmentListener(new java.awt.event.AdjustmentListener() {
             public void adjustmentValueChanged(java.awt.event.AdjustmentEvent evt) {
-                jScrollBarMtr2AdjustmentValueChanged(evt);
+                jScrollBarMtr2_TargetAdjustmentValueChanged(evt);
             }
         });
-        getContentPane().add(jScrollBarMtr2, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 53, 30, 130));
+        getContentPane().add(jScrollBarMtr2_Target, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 53, 30, 130));
 
-        jScrollBarMtr3.setBlockIncrement(20);
-        jScrollBarMtr3.setMaximum(720);
-        jScrollBarMtr3.setMinimum(340);
-        jScrollBarMtr3.setValue(500);
-        jScrollBarMtr3.setVisibleAmount(20);
-        jScrollBarMtr3.addAdjustmentListener(new java.awt.event.AdjustmentListener() {
+        jScrollBarMtr3_Target.setBlockIncrement(20);
+        jScrollBarMtr3_Target.setMaximum(720);
+        jScrollBarMtr3_Target.setMinimum(340);
+        jScrollBarMtr3_Target.setValue(500);
+        jScrollBarMtr3_Target.setVisibleAmount(20);
+        jScrollBarMtr3_Target.addAdjustmentListener(new java.awt.event.AdjustmentListener() {
             public void adjustmentValueChanged(java.awt.event.AdjustmentEvent evt) {
-                jScrollBarMtr3AdjustmentValueChanged(evt);
+                jScrollBarMtr3_TargetAdjustmentValueChanged(evt);
             }
         });
-        getContentPane().add(jScrollBarMtr3, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 53, 33, 130));
+        getContentPane().add(jScrollBarMtr3_Target, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 53, 33, 130));
 
         jScrollBarMtr4_Target.setBlockIncrement(20);
         jScrollBarMtr4_Target.setMaximum(-385);
@@ -1274,26 +1270,26 @@ public class JFrameClass extends javax.swing.JFrame {
         jLabelMotor1.setText(""+150);
     }//GEN-LAST:event_jButtonMoveMtr1ToPresetLowActionPerformed
 
-    private void jScrollBarMtr1AdjustmentValueChanged(java.awt.event.AdjustmentEvent evt) {//GEN-FIRST:event_jScrollBarMtr1AdjustmentValueChanged
-        short j = (short)jScrollBarMtr1.getValue();
+    private void jScrollBarMtr1_TargetAdjustmentValueChanged(java.awt.event.AdjustmentEvent evt) {//GEN-FIRST:event_jScrollBarMtr1_TargetAdjustmentValueChanged
+        short j = (short)jScrollBarMtr1_Target.getValue();
         motor1.moveMotor(j);
         TargetPosMtr1 = (int)j;
         jLabelMotor1.setText(""+j);
-    }//GEN-LAST:event_jScrollBarMtr1AdjustmentValueChanged
+    }//GEN-LAST:event_jScrollBarMtr1_TargetAdjustmentValueChanged
 
-    private void jScrollBarMtr2AdjustmentValueChanged(java.awt.event.AdjustmentEvent evt) {//GEN-FIRST:event_jScrollBarMtr2AdjustmentValueChanged
-        short j = (short)jScrollBarMtr2.getValue();
+    private void jScrollBarMtr2_TargetAdjustmentValueChanged(java.awt.event.AdjustmentEvent evt) {//GEN-FIRST:event_jScrollBarMtr2_TargetAdjustmentValueChanged
+        short j = (short)jScrollBarMtr2_Target.getValue();
         motor2.moveMotor(j);
         TargetPosMtr2 = (int)j;
         jLabelMotor2.setText(""+j);
-    }//GEN-LAST:event_jScrollBarMtr2AdjustmentValueChanged
+    }//GEN-LAST:event_jScrollBarMtr2_TargetAdjustmentValueChanged
 
-    private void jScrollBarMtr3AdjustmentValueChanged(java.awt.event.AdjustmentEvent evt) {//GEN-FIRST:event_jScrollBarMtr3AdjustmentValueChanged
-        short j = (short)jScrollBarMtr3.getValue();
+    private void jScrollBarMtr3_TargetAdjustmentValueChanged(java.awt.event.AdjustmentEvent evt) {//GEN-FIRST:event_jScrollBarMtr3_TargetAdjustmentValueChanged
+        short j = (short)jScrollBarMtr3_Target.getValue();
         motor3.moveMotor(j);
         TargetPosMtr3 = (int)j;
         jLabelMotor3.setText(""+j);
-    }//GEN-LAST:event_jScrollBarMtr3AdjustmentValueChanged
+    }//GEN-LAST:event_jScrollBarMtr3_TargetAdjustmentValueChanged
 
     private void jScrollBarMtr4_TargetAdjustmentValueChanged(java.awt.event.AdjustmentEvent evt) {//GEN-FIRST:event_jScrollBarMtr4_TargetAdjustmentValueChanged
         short j = (short)Math.abs((short)jScrollBarMtr4_Target.getValue());
@@ -1312,7 +1308,7 @@ public class JFrameClass extends javax.swing.JFrame {
         //short currentPos = motor1.readPosition(); // currentPos is a local reading - testing to see if using the more global variable is better
         System.out.println("currentPosXXXXX "+ position1 + "; moveIncrement "+moveIncrement +" TargetPosMtr1 "+TargetPosMtr1 );
         TargetPosMtr1 = TargetPosMtr1 + moveIncrement;
-        jScrollBarMtr1.setValue(TargetPosMtr1);
+        jScrollBarMtr1_Target.setValue(TargetPosMtr1);
         motor1.moveMotor((short)(TargetPosMtr1));
          try {
              sleep(1);
@@ -1331,7 +1327,7 @@ public class JFrameClass extends javax.swing.JFrame {
         short currentPos = motor1.readPosition();
         System.out.println("currentPos "+ currentPos + "; moveIncrement "+moveIncrement +" TargetPosMtr1 "+TargetPosMtr1 );
         TargetPosMtr1 = TargetPosMtr1 + moveIncrement;
-        jScrollBarMtr1.setValue(TargetPosMtr1);
+        jScrollBarMtr1_Target.setValue(TargetPosMtr1);
         motor1.moveMotor((short)(TargetPosMtr1));
          try {
              sleep(1);
@@ -1376,7 +1372,7 @@ public class JFrameClass extends javax.swing.JFrame {
         short currentPos = motor2.readPosition();
         System.out.println("currentPos "+ currentPos + "; moveIncrement "+moveIncrement +" TargetPosMtr2 "+TargetPosMtr2 );
         TargetPosMtr2 = TargetPosMtr2 + moveIncrement;
-        jScrollBarMtr2.setValue(TargetPosMtr2);
+        jScrollBarMtr2_Target.setValue(TargetPosMtr2);
         motor2.moveMotor((short)(TargetPosMtr2));
          try {
              sleep(1);
@@ -1396,7 +1392,7 @@ public class JFrameClass extends javax.swing.JFrame {
         short currentPos = motor2.readPosition();
         System.out.println("currentPos "+ currentPos + "; moveIncrement "+moveIncrement +" TargetPosMtr2 "+TargetPosMtr2 );
         TargetPosMtr2 = TargetPosMtr2 + moveIncrement;
-        jScrollBarMtr2.setValue(TargetPosMtr2);
+        jScrollBarMtr2_Target.setValue(TargetPosMtr2);
         motor2.moveMotor((short)(TargetPosMtr2));
          try {
              sleep(1);
@@ -1436,7 +1432,7 @@ public class JFrameClass extends javax.swing.JFrame {
         short currentPos = motor3.readPosition();
         System.out.println("currentPos "+ currentPos + "; moveIncrement "+moveIncrement +" TargetPosMtr3 "+TargetPosMtr3 );
         TargetPosMtr3 = TargetPosMtr3 + moveIncrement;
-        jScrollBarMtr3.setValue(TargetPosMtr3);
+        jScrollBarMtr3_Target.setValue(TargetPosMtr3);
         motor3.moveMotor((short)(TargetPosMtr3));
          try {
              sleep(1);
@@ -1456,7 +1452,7 @@ public class JFrameClass extends javax.swing.JFrame {
         short currentPos = motor3.readPosition();
         System.out.println("currentPos "+ currentPos + "; moveIncrement "+moveIncrement +" TargetPosMtr3 "+TargetPosMtr3 );
         TargetPosMtr3 = TargetPosMtr3 + moveIncrement;
-        jScrollBarMtr3.setValue(TargetPosMtr3);
+        jScrollBarMtr3_Target.setValue(TargetPosMtr3);
         motor3.moveMotor((short)(TargetPosMtr3));
          try {
              sleep(1);
@@ -1680,9 +1676,9 @@ public class JFrameClass extends javax.swing.JFrame {
         if(TargetPosMtr3>1300 || TargetPosMtr3<=0){TargetPosMtr3=HomePosMtr3;} // if the value read from the stored preferences from a prior session is outside the range of the dynamixel assume it is an error and use the home position instead.
         if(TargetPosMtr4>1300 || TargetPosMtr4<=0){TargetPosMtr4=HomePosMtr4;} // if the value read from the stored preferences from a prior session is outside the range of the dynamixel assume it is an error and use the home position instead.
                     
-        jScrollBarMtr1.setValue(TargetPosMtr1); motor1.moveMotor((short)TargetPosMtr1); jLabelMotor1.setText(""+TargetPosMtr1);
-        jScrollBarMtr2.setValue(TargetPosMtr2); motor2.moveMotor((short)TargetPosMtr2); jLabelMotor2.setText(""+TargetPosMtr2);
-        jScrollBarMtr3.setValue(TargetPosMtr3); motor3.moveMotor((short)TargetPosMtr3); jLabelMotor3.setText(""+TargetPosMtr3);
+        jScrollBarMtr1_Target.setValue(TargetPosMtr1); motor1.moveMotor((short)TargetPosMtr1); jLabelMotor1.setText(""+TargetPosMtr1);
+        jScrollBarMtr2_Target.setValue(TargetPosMtr2); motor2.moveMotor((short)TargetPosMtr2); jLabelMotor2.setText(""+TargetPosMtr2);
+        jScrollBarMtr3_Target.setValue(TargetPosMtr3); motor3.moveMotor((short)TargetPosMtr3); jLabelMotor3.setText(""+TargetPosMtr3);
         jScrollBarMtr4_Target.setValue(TargetPosMtr4*-1); motor4.moveMotor((short)TargetPosMtr4); jLabelMotor4.setText(""+TargetPosMtr4);
         
     }//GEN-LAST:event_jRadioButtonSavedPositions1ActionPerformed
@@ -1700,8 +1696,8 @@ public class JFrameClass extends javax.swing.JFrame {
         System.out.println("TargetPosMtr3 " + TargetPosMtr3);
         System.out.println("TargetPosMtr4 " + TargetPosMtr4);
         
-        jScrollBarMtr2.setValue(TargetPosMtr2); motor2.moveMotor((short)TargetPosMtr2); jLabelMotor2.setText(""+TargetPosMtr2);
-        jScrollBarMtr3.setValue(TargetPosMtr3); motor3.moveMotor((short)TargetPosMtr3); jLabelMotor3.setText(""+TargetPosMtr3);
+        jScrollBarMtr2_Target.setValue(TargetPosMtr2); motor2.moveMotor((short)TargetPosMtr2); jLabelMotor2.setText(""+TargetPosMtr2);
+        jScrollBarMtr3_Target.setValue(TargetPosMtr3); motor3.moveMotor((short)TargetPosMtr3); jLabelMotor3.setText(""+TargetPosMtr3);
         
         // move arm up and wait a bit before moving it left/right to the home position so it doesn't drag along the ground
         // also don't move the end effector until arm moved up
@@ -1710,9 +1706,8 @@ public class JFrameClass extends javax.swing.JFrame {
             } catch (InterruptedException ex) {
                 Logger.getLogger(JFrameClass.class.getName()).log(Level.SEVERE, null, ex);
             }
-        jScrollBarMtr1.setValue(TargetPosMtr1); motor1.moveMotor((short)TargetPosMtr1); jLabelMotor1.setText(""+TargetPosMtr1);
+        jScrollBarMtr1_Target.setValue(TargetPosMtr1); motor1.moveMotor((short)TargetPosMtr1); jLabelMotor1.setText(""+TargetPosMtr1);
         jScrollBarMtr4_Target.setValue(TargetPosMtr4*-1); motor4.moveMotor((short)TargetPosMtr4); jLabelMotor4.setText(""+TargetPosMtr4);
-        
         }
     }//GEN-LAST:event_jRadioButtonHomePositions1ActionPerformed
 
@@ -1854,9 +1849,9 @@ public class JFrameClass extends javax.swing.JFrame {
     private javax.swing.JRadioButton jRadioButtonPriorActualPositions;
     private javax.swing.JRadioButton jRadioButtonPriorTargetPositions;
     private javax.swing.JRadioButton jRadioButtonSavedPositions1;
-    private javax.swing.JScrollBar jScrollBarMtr1;
-    private javax.swing.JScrollBar jScrollBarMtr2;
-    private javax.swing.JScrollBar jScrollBarMtr3;
+    private javax.swing.JScrollBar jScrollBarMtr1_Target;
+    private javax.swing.JScrollBar jScrollBarMtr2_Target;
+    private javax.swing.JScrollBar jScrollBarMtr3_Target;
     private javax.swing.JScrollBar jScrollBarMtr4_Actual;
     private javax.swing.JScrollBar jScrollBarMtr4_Target;
     private javax.swing.JScrollPane jScrollPane1;

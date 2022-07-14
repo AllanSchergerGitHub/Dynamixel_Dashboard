@@ -55,7 +55,7 @@
         </Constraint>
       </Constraints>
     </Component>
-    <Component class="javax.swing.JScrollBar" name="jScrollBarMtr1">
+    <Component class="javax.swing.JScrollBar" name="jScrollBarMtr1_Target">
       <Properties>
         <Property name="blockIncrement" type="int" value="20"/>
         <Property name="maximum" type="int" value="1000"/>
@@ -63,7 +63,7 @@
         <Property name="visibleAmount" type="int" value="20"/>
       </Properties>
       <Events>
-        <EventHandler event="adjustmentValueChanged" listener="java.awt.event.AdjustmentListener" parameters="java.awt.event.AdjustmentEvent" handler="jScrollBarMtr1AdjustmentValueChanged"/>
+        <EventHandler event="adjustmentValueChanged" listener="java.awt.event.AdjustmentListener" parameters="java.awt.event.AdjustmentEvent" handler="jScrollBarMtr1_TargetAdjustmentValueChanged"/>
       </Events>
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
@@ -81,7 +81,7 @@
         </Constraint>
       </Constraints>
     </Component>
-    <Component class="javax.swing.JScrollBar" name="jScrollBarMtr2">
+    <Component class="javax.swing.JScrollBar" name="jScrollBarMtr2_Target">
       <Properties>
         <Property name="blockIncrement" type="int" value="20"/>
         <Property name="maximum" type="int" value="1000"/>
@@ -90,7 +90,7 @@
         <Property name="visibleAmount" type="int" value="20"/>
       </Properties>
       <Events>
-        <EventHandler event="adjustmentValueChanged" listener="java.awt.event.AdjustmentListener" parameters="java.awt.event.AdjustmentEvent" handler="jScrollBarMtr2AdjustmentValueChanged"/>
+        <EventHandler event="adjustmentValueChanged" listener="java.awt.event.AdjustmentListener" parameters="java.awt.event.AdjustmentEvent" handler="jScrollBarMtr2_TargetAdjustmentValueChanged"/>
       </Events>
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
@@ -98,7 +98,7 @@
         </Constraint>
       </Constraints>
     </Component>
-    <Component class="javax.swing.JScrollBar" name="jScrollBarMtr3">
+    <Component class="javax.swing.JScrollBar" name="jScrollBarMtr3_Target">
       <Properties>
         <Property name="blockIncrement" type="int" value="20"/>
         <Property name="maximum" type="int" value="720"/>
@@ -107,7 +107,7 @@
         <Property name="visibleAmount" type="int" value="20"/>
       </Properties>
       <Events>
-        <EventHandler event="adjustmentValueChanged" listener="java.awt.event.AdjustmentListener" parameters="java.awt.event.AdjustmentEvent" handler="jScrollBarMtr3AdjustmentValueChanged"/>
+        <EventHandler event="adjustmentValueChanged" listener="java.awt.event.AdjustmentListener" parameters="java.awt.event.AdjustmentEvent" handler="jScrollBarMtr3_TargetAdjustmentValueChanged"/>
       </Events>
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
