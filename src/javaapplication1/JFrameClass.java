@@ -3,6 +3,12 @@
 started to refactor the code at 9:20PM on Dec 13, 2021
 https://stackoverflow.com/questions/26265002/pause-and-resume-swingworker-doinbackground
 
+Notes about coordinate system:
+    x is left/right if looking down on rover from top (while facing forward)
+    y is forward/back if looking down on rover from top (while facing forward)
+    z is up/down relative to the ground. ground is roughly at z=75; the robot arm connects to the rover at z=100.
+    base is assumed to be at 100, 100, 100 (xyz) so all calcs are in positive numbers.
+
 Several modes of operation:
     1) manually move the motor rotation to desired position; using visual observation of end effector to know xyz
     2) manually move the xyz variables and use math (or a precalc'd table) to derive the required motor rotation positions.
@@ -16,6 +22,7 @@ Several modes of operation:
 
 Questions:
     1) do I need to create a queue of commands that need to be completed one after another sequentially? Or can I interupt the current queue of commands before the queue is completed?
+    2) need to send location and speed (and possibly sleep) for each subphase of a move along a path.
 
 Layers:
     Goals
@@ -121,9 +128,14 @@ public class JFrameClass extends javax.swing.JFrame {
     MotorClass motor3 = new MotorClass();
     MotorClass motor4 = new MotorClass();
     
+    double[][][] arr = new double[200][100151][25];
+    double baseX = 100;
+    double baseY = 50;
+    double baseZ = 100;
+    double distBaseToElbow = 9.2075;
+    double distElbowToEnd = 20.32;
     
     public void startupMethod(){
-        System.out.println("did i print this?");
         JFrameClassUpdater mJFrameClassUpdater = new JFrameClassUpdater();
         mJFrameClassUpdater.execute();
         initComponents();
@@ -152,6 +164,54 @@ public class JFrameClass extends javax.swing.JFrame {
         protected Void doInBackground()
                 {
                     System.out.println("Make sure power is connected and working. Can I automate this validation step?");
+                    
+                    
+                    int rowNumber = 1;
+                    for (int angleElbowIndex = 39-39; angleElbowIndex <= 150+39; angleElbowIndex++){
+                            int angleElbow = angleElbowIndex-39;
+                        for(int angleElbowWristDifferential = 1; angleElbowWristDifferential <=130; angleElbowWristDifferential++){
+                            
+                            int angleWrist = 100000 + angleElbow-angleElbowWristDifferential; // adding 100,000 to the value since an array can't hold negative values
+                            System.out.print("rowNumber; " + rowNumber + "; angleElbow; " + (angleElbow) + "; angleWrist; " + (angleWrist-100000) + "; elbowWristDiff; "+ angleElbowWristDifferential+"; ");
+                            rowNumber++;
+                            try{
+                                arr[angleElbowIndex][angleWrist][2] = angleElbowWristDifferential; //angleElbowIndex
+
+                                arr[angleElbowIndex][angleWrist][3] = angleElbow-arr[angleElbowIndex][angleElbowWristDifferential][2]; // angle elbow minus wrist should always be positive (otherwise the elbow is bending backwards)
+                                System.out.print(" angleWrist; " + arr[angleElbowIndex][angleWrist][3] + "; " );
+                                //arr[angleElbowIndex][angleWrist][5] = baseX; // it seems unnessary to populate these constants here
+                                //arr[angleElbowIndex][angleWrist][6] = baseY; // it seems unnessary to populate these constants here
+                                //arr[angleElbowIndex][angleWrist][7] = baseZ; // it seems unnessary to populate these constants here
+
+                                arr[angleElbowIndex][angleWrist][14] = baseX; // calc'd elbowX position - initially there isn't a difference in the x position between base and elbow. This is facing straight forward from base.
+                                arr[angleElbowIndex][angleWrist][15] = baseY + distBaseToElbow*Math.cos(Math.toRadians(angleElbow)); // calc'd elbowY  position
+                                arr[angleElbowIndex][angleWrist][16] = baseZ + distBaseToElbow*Math.sin(Math.toRadians(angleElbow)); // calc'd elbowZ position
+                                //arr[angleElbowIndex][angleWrist][13] = 0; // calc'd distance: base to end effector
+                                
+                                //arr[angleElbowIndex][angleWrist][17] = distBaseToElbow // actual distance, base to elbow; doesn't need to be part of the array
+                                
+                                arr[angleElbowIndex][angleWrist][8] = arr[angleElbowIndex][angleWrist][14]; // calc'd end effectorX
+                                arr[angleElbowIndex][angleWrist][9] = arr[angleElbowIndex][angleWrist][15]+distElbowToEnd*Math.cos(Math.toRadians(angleWrist-100000)); // calc'd end effectorY
+                                arr[angleElbowIndex][angleWrist][10] = arr[angleElbowIndex][angleWrist][16]+distElbowToEnd*Math.sin(Math.toRadians(angleWrist-100000)); // calc'd end effectorZ
+                                System.out.print("EndEffectorX; " + String.format("%02.2f",arr[angleElbowIndex][angleWrist][8]) + "; " );
+                                System.out.print("EndEffectorY; " + String.format("%02.2f",arr[angleElbowIndex][angleWrist][9]) + "; " );
+                                System.out.print("EndEffectorZ; " + String.format("%02.2f",arr[angleElbowIndex][angleWrist][10]) + "; " );
+                                
+                                //System.out.print(arr[angleElbowIndex][angleWrist][13] + "; " );
+                                System.out.print("elbowX; " + String.format("%02.2f",arr[angleElbowIndex][angleWrist][14]) + "; " );
+                                System.out.print("elbowY; " + String.format("%02.2f",arr[angleElbowIndex][angleWrist][15]) + "; " );
+                                System.out.print("elbowZ; " + String.format("%02.2f",arr[angleElbowIndex][angleWrist][16]) + "; " );
+                                
+                                System.out.println("");
+                                }
+                                catch(ArrayIndexOutOfBoundsException ex) {
+                                    Logger.getLogger(MotorClass.class.getName()).log(Level.SEVERE, null, ex);
+                                }     
+                        }
+                    }
+                    System.out.println("one: " + arr[41][4][0]);
+                    System.out.println("two: " + arr[41][5][0]);                    
+                    
                     
                     while (true) { 
                     Native.setProtected(true);
@@ -368,6 +428,10 @@ public class JFrameClass extends javax.swing.JFrame {
 //                                    time_stamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss.SSS").format(new Date());
 //                                    System.out.println("Last time_stamp " + time_stamp);
                                     }
+                                
+                                if(x < 200){
+                                    System.out.println("value = " +x + ": " + arr[x][0][0]);
+                                }
                                 
                                 
                                     position1 = motor1.readPosition(); // error here may mean this is starting before devices are connected.
@@ -1296,6 +1360,8 @@ public class JFrameClass extends javax.swing.JFrame {
 
     private void jScrollBarMtr4_TargetAdjustmentValueChanged(java.awt.event.AdjustmentEvent evt) {//GEN-FIRST:event_jScrollBarMtr4_TargetAdjustmentValueChanged
         short j = (short)Math.abs((short)jScrollBarMtr4_Target.getValue());
+        int val = Integer.valueOf(jTextFieldSpeedMotor4.getText());
+        motor4.setMovingSpeed(val);
         motor4.moveMotor((short)j);
         TargetPosMtr4 = (int)j;
         jLabelMotor4.setText(""+j);
